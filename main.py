@@ -1,5 +1,5 @@
 import pygame
-from config import running, first, second
+from config import running, first, second, FPS
 from render import Render
 
 window = Render()
@@ -14,21 +14,26 @@ while running:
         if event.type == pygame.MOUSEBUTTONDOWN:
             click = pygame.mouse.get_pressed()
             position = pygame.mouse.get_pos()
-            if click[0] is True:
-                if first is True:
-                    first, second = second, first
-                    window.update_start(position)
-                elif second is True:
-                    first, second = second, first
-                    window.reload_screen()
-                    window.append_lines(position)
+            if position[1] >= 100:
+                if click[0] is True:
+                    if first is True:
+                        first, second = second, first
+                        window.update_start(position)
+                    elif second is True:
+                        first, second = second, first
+                        window.reload_screen()
+                        window.append_lines(position)
+            else:
+                window.get_color(position)
             if click[2] is True:
-                window.lines = []
+                window.update_lines()
                 window.reload_screen()
     if second is True:
         window.reload_screen()
         window.create_line(pygame.mouse.get_pos())
     window.render_lines()
+    window.clock.tick(FPS)
+    window.draw_rects()
     pygame.display.update()
 
 pygame.quit()
