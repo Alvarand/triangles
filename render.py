@@ -1,6 +1,5 @@
 import pygame
-from config import running, WHITE, \
-    BLUE, WINDOW, first, second
+from config import WHITE, BLUE, WINDOW
 
 
 class Render:
@@ -26,35 +25,3 @@ class Render:
 
     def append_lines(self, end_pos):
         self.lines.append([self.start_pos[0], self.start_pos[1], end_pos[0], end_pos[1]])
-
-
-window = Render()
-
-while running:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_ESCAPE:
-                running = False
-        if event.type == pygame.MOUSEBUTTONDOWN:
-            click = pygame.mouse.get_pressed()
-            position = pygame.mouse.get_pos()
-            if click[0] is True:
-                if first is True:
-                    first, second = second, first
-                    window.update_start(position)
-                elif second is True:
-                    first, second = second, first
-                    window.reload_screen()
-                    window.append_lines(position)
-            if click[2] is True:
-                window.lines = []
-                window.reload_screen()
-    if second is True:
-        window.reload_screen()
-        window.create_line(pygame.mouse.get_pos())
-    window.render_lines()
-    pygame.display.update()
-
-pygame.quit()
