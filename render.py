@@ -9,13 +9,12 @@ class Render:
         self.screen = pygame.display.set_mode(WINDOW)
         self.clock = pygame.time.Clock()
         self.screen.fill(GREY)
-        self.default_lines = [[0, 100, 1024, 100, RED]]
+        self.default_lines = []
         self.lines = copy.deepcopy(self.default_lines)
         self.start_pos = (0, 0)
         self.rects = rects
         self.bg_color = GREY
         self.color = BLUE
-        pygame.draw.rect(self.screen, RED, (0, 0, 100, 100))
 
     def update_start(self, pos):
         self.start_pos = pos
