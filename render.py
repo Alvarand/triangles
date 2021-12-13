@@ -1,5 +1,5 @@
 import pygame
-from config import GREY, BLUE, WINDOW, RED, rects
+from config import GREY, BLUE, WINDOW, rects
 import copy
 
 
@@ -11,6 +11,7 @@ class Render:
         self.screen.fill(GREY)
         self.default_lines = []
         self.lines = copy.deepcopy(self.default_lines)
+        self.first_angle_pos = (0, 0)
         self.start_pos = (0, 0)
         self.rects = rects
         self.bg_color = GREY
@@ -41,3 +42,11 @@ class Render:
 
     def get_color(self, pos):
         self.color = self.screen.get_at(pos)
+
+    def update_first_angle(self, pos):
+        self.first_angle_pos = pos
+        self.start_pos = pos
+
+    def create_triangle(self, end_pos):
+        self.lines.append([self.start_pos[0], self.start_pos[1], end_pos[0], end_pos[1], self.color])
+        self.lines.append([self.first_angle_pos[0], self.first_angle_pos[1], end_pos[0], end_pos[1], self.color])
