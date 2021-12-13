@@ -6,6 +6,7 @@ def random_color():
 
 
 running = True
+angle = 0
 WINDOW = WIDTH, HEIGHT = 600, 512
 FPS = 60
 GREY = (220, 220, 220)
