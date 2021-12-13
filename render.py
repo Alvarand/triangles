@@ -57,15 +57,15 @@ class Render:
         self.lines.append([self.first_angle_pos[0], self.first_angle_pos[1], end_pos[0], end_pos[1], self.color])
 
     def update(self):
+        self.draw_rects()
         self.render_lines()
         self.clock.tick(self.FPS)
-        self.draw_rects()
         pygame.display.update()
 
     def click(self):
         mouse_click = pygame.mouse.get_pressed()
         position = pygame.mouse.get_pos()
-        if position[1] > 100:
+        if position[1] > 100 and position[0] < 400:
             if mouse_click[0] is True:
                 if self.angle == 0:
                     self.angle += 1
@@ -79,8 +79,8 @@ class Render:
                     self.angle = 0
                     self.reload_screen()
                     self.create_triangle(position)
-        elif position[0] < 600:
+        elif position[1] < 100 and position[0] < 600:
             self.get_color(position)
-        if mouse_click[2] is True:
+        if mouse_click[2] is True and self.angle == 0:
             self.update_lines()
             self.reload_screen()
