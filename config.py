@@ -16,11 +16,12 @@ RED = (255, 0, 0)
 GREEN = (0, 100, 0)
 BLUE = (0, 0, 255)
 first, second = True, False
-default_lines = [[0, 100, 700, 100, BLACK],
-                 [600, 100, 700, 100, BLACK],
-                 [600, 0, 700, 0, BLACK],
-                 [600, 0, 600, 100, BLACK],
-                 [699, 0, 699, 100, BLACK]
+default_lines = [[0, 100, WIDTH, 100, BLACK],
+                 [WIDTH - 100, 100, WIDTH - 100, 100, BLACK],
+                 [WIDTH - 100, 0, WIDTH, 0, BLACK],
+                 [WIDTH - 100, 0, WIDTH - 100, 100, BLACK],
+                 [WIDTH - 1, 0, WIDTH - 1, 100, BLACK],
+                 [400, 100, 400, HEIGHT, BLACK]
                  ]
 rects = [[0, 0, 100, 100, RED],
          [100, 0, 100, 100, BLUE],
@@ -28,4 +29,6 @@ rects = [[0, 0, 100, 100, RED],
          [300, 0, 100, 100, random_color()],
          [400, 0, 100, 100, random_color()],
          [500, 0, 100, 100, random_color()],
+         [400, 100, WIDTH - 400, HEIGHT - 100, WHITE],
+         [601, 1, 99, 99, GREY]
          ]
