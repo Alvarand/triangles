@@ -1,5 +1,5 @@
 import pygame
-from config import running, angle
+from config import running
 from render import Render
 
 window = Render()

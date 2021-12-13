@@ -1,5 +1,5 @@
 import pygame
-from config import GREY, BLUE, WINDOW, rects, FPS
+from config import GREY, BLUE, WINDOW, rects, FPS, default_lines
 import copy
 
 
@@ -9,8 +9,6 @@ class Render:
         self.screen = pygame.display.set_mode(WINDOW)
         self.clock = pygame.time.Clock()
         self.screen.fill(GREY)
-        self.default_lines = []
-        self.lines = copy.deepcopy(self.default_lines)
         self.first_angle_pos = (0, 0)
         self.start_pos = (0, 0)
         self.rects = rects
@@ -18,6 +16,9 @@ class Render:
         self.color = BLUE
         self.FPS = FPS
         self.angle = 0
+        self.line_color = [610, 10, 690, 90, self.color]
+        self.default_lines = [self.line_color] + default_lines
+        self.lines = copy.deepcopy(self.default_lines)
 
     def update_start(self, pos):
         self.start_pos = pos
@@ -44,6 +45,8 @@ class Render:
 
     def get_color(self, pos):
         self.color = self.screen.get_at(pos)
+        self.line_color[-1] = self.color
+        self.lines[0][-1] = self.color
 
     def update_first_angle(self, pos):
         self.first_angle_pos = pos
@@ -62,7 +65,7 @@ class Render:
     def click(self):
         mouse_click = pygame.mouse.get_pressed()
         position = pygame.mouse.get_pos()
-        if position[1] >= 100:
+        if position[1] > 100:
             if mouse_click[0] is True:
                 if self.angle == 0:
                     self.angle += 1
@@ -76,7 +79,7 @@ class Render:
                     self.angle = 0
                     self.reload_screen()
                     self.create_triangle(position)
-        else:
+        elif position[0] < 600:
             self.get_color(position)
         if mouse_click[2] is True:
             self.update_lines()

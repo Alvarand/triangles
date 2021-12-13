@@ -7,16 +7,21 @@ def random_color():
 
 running = True
 angle = 0
-WINDOW = WIDTH, HEIGHT = 600, 512
+WINDOW = WIDTH, HEIGHT = 700, 512
 FPS = 60
 GREY = (220, 220, 220)
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 RED = (255, 0, 0)
-GREEN = (0, 255, 0)
+GREEN = (0, 100, 0)
 BLUE = (0, 0, 255)
 first, second = True, False
-lines = []
+default_lines = [[0, 100, 700, 100, BLACK],
+                 [600, 100, 700, 100, BLACK],
+                 [600, 0, 700, 0, BLACK],
+                 [600, 0, 600, 100, BLACK],
+                 [699, 0, 699, 100, BLACK]
+                 ]
 rects = [[0, 0, 100, 100, RED],
          [100, 0, 100, 100, BLUE],
          [200, 0, 100, 100, GREEN],
