@@ -4,22 +4,93 @@ import copy
 
 
 class Coordinates:
+
     def __init__(self, x=None, y=None):
         self.x = x
         self.y = y
 
 
 class Line:
+
     def __init__(self, x=None, y=None):
         self.start_pos = Coordinates(x, y)
         self.end_pos = Coordinates()
 
 
 class Triangle:
+
     def __init__(self):
-        self.line1 = Line()
-        self.line2 = Line()
-        self.line3 = Line()
+        self.lines = []
+        self.color = BLUE
+
+    def add_line(self, pos):
+        self.lines.append(Line(pos[0], pos[1]))
+        if len(self.lines) != 1:
+            self.lines[len(self.lines) - 2].end_pos.x = pos[0]
+            self.lines[len(self.lines) - 2].end_pos.y = pos[1]
+        if len(self.lines) == 3:
+            self.lines[-1].end_pos.x = self.lines[0].start_pos.x
+            self.lines[-1].end_pos.y = self.lines[0].start_pos.y
+
+
+class NewRender:
+
+    def __init__(self):
+        self.triangles = []
+        self.current_triangle = Triangle()
+        self.screen = pygame.display.set_mode(WINDOW)
+        self.clock = pygame.time.Clock()
+        self.screen.fill(GREY)
+        self.FPS = FPS
+        self.bg_color = GREY
+
+    def render_triangles(self):
+        if len(self.current_triangle.lines) == 3:
+            self.triangles.append(self.current_triangle)
+            self.current_triangle = Triangle()
+
+        for triangle in self.triangles:
+            for line in triangle.lines:
+                pygame.draw.line(self.screen, triangle.color, (line.start_pos.x, line.start_pos.y),
+                                 (line.end_pos.x, line.end_pos.y))
+
+    def render_current_triangle(self, pos):
+        if len(self.current_triangle.lines) > 0:
+            for line in self.current_triangle.lines[:-1]:
+                pygame.draw.line(self.screen, self.current_triangle.color, (line.start_pos.x, line.start_pos.y),
+                                 (line.end_pos.x, line.end_pos.y))
+            pygame.draw.line(self.screen, self.current_triangle.color,
+                             (self.current_triangle.lines[-1].start_pos.x,
+                              self.current_triangle.lines[-1].start_pos.y),
+                             (pos[0], pos[1]))
+
+    def clear_triangles(self):
+        self.triangles = []
+
+    def reload_screen(self):
+        self.screen.fill(self.bg_color)
+
+    def get_color(self, pos):
+        self.current_triangle.color = self.screen.get_at(pos)
+
+    def click(self):
+        mouse_click = pygame.mouse.get_pressed()
+        position = pygame.mouse.get_pos()
+        if position[1] > 100 and position[0] < 400:
+            if mouse_click[0] is True:
+                self.current_triangle.add_line(position)
+        elif position[1] < 100 and position[0] < 600:
+            self.get_color(position)
+        if mouse_click[2] is True and len(self.current_triangle.lines) == 0:
+            self.clear_triangles()
+            self.reload_screen()
+
+    def update(self):
+        self.reload_screen()
+        self.render_triangles()
+        self.render_current_triangle(pygame.mouse.get_pos())
+        self.clock.tick(self.FPS)
+        pygame.display.update()
 
 
 class Render:
