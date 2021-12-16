@@ -1,5 +1,5 @@
 import pygame
-from math import sqrt
+from math import sqrt, acos, degrees
 from config import GREY, BLUE, WINDOW, rects, FPS, default_lines
 
 
@@ -23,6 +23,7 @@ class Triangle:
         self.lines = []
         self.color = BLUE
         self.sides_length = []
+        self.angles = []
 
     def add_line(self, pos):
         self.lines.append(Line(pos[0], pos[1]))
@@ -34,12 +35,19 @@ class Triangle:
             self.lines[-1].end_pos.y = self.lines[0].start_pos.y
 
     def calculate_distance(self):
-        a, b, c = [line.start_pos for line in self.lines]
-        for lst in ([a, b], [b, c], [a, c]):
-            x = abs(lst[0].x - lst[1].x)
-            y = abs(lst[0].y - lst[1].y)
+        line1, line2, line3 = [line.start_pos for line in self.lines]
+        for a, b in ([line1, line2], [line2, line3], [line1, line3]):
+            x = abs(a.x - b.x)
+            y = abs(a.y - b.y)
             length = sqrt(x * x + y * y) * 2.5 / 96
             self.sides_length.append(length)
+        self.calculate_angle()
+
+    def calculate_angle(self):
+        len1, len2, len3 = self.sides_length
+        for a, b, c in ([len1, len3, len2], [len2, len1, len3], [len3, len2, len1]):
+            angle = degrees(acos((a * a + b * b - c * c) / (2 * a * b)))
+            self.angles.append(angle)
 
 
 class NewRender:
