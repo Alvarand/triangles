@@ -33,6 +33,14 @@ class Triangle:
             self.lines[-1].end_pos.x = self.lines[0].start_pos.x
             self.lines[-1].end_pos.y = self.lines[0].start_pos.y
 
+    def calculate_distance(self):
+        a, b, c = [line.start_pos for line in self.lines]
+        for lst in ([a, b], [b, c], [a, c]):
+            x = abs(lst[0].x - lst[1].x)
+            y = abs(lst[0].y - lst[1].y)
+            length = sqrt(x * x + y * y) * 2.5 / 96
+            self.side_length.append(length)
+
 
 class NewRender:
 
@@ -50,8 +58,7 @@ class NewRender:
 
     def render_triangles(self):
         if len(self.current_triangle.lines) == 3:
-            a, b, c = [line.start_pos for line in self.current_triangle.lines]
-            self.calculate_distance(a, b, c)
+            self.current_triangle.calculate_distance()
             self.triangles.append(self.current_triangle)
             self.current_triangle = Triangle()
             self.current_triangle.color = self.line_color[-1]
@@ -60,13 +67,6 @@ class NewRender:
             for line in triangle.lines:
                 pygame.draw.line(self.screen, triangle.color, (line.start_pos.x, line.start_pos.y),
                                  (line.end_pos.x, line.end_pos.y))
-
-    def calculate_distance(self, a, b, c):
-        for lst in ([a, b], [b, c], [a, c]):
-            x = abs(lst[0].x - lst[1].x)
-            y = abs(lst[0].y - lst[1].y)
-            length = sqrt(x * x + y * y)
-            self.current_triangle.side_length.append(length)
 
     def render_current_triangle(self, pos):
         if len(self.current_triangle.lines) > 0:
