@@ -22,7 +22,7 @@ class Triangle:
     def __init__(self):
         self.lines = []
         self.color = BLUE
-        self.side_length = []
+        self.sides_length = []
 
     def add_line(self, pos):
         self.lines.append(Line(pos[0], pos[1]))
@@ -39,7 +39,7 @@ class Triangle:
             x = abs(lst[0].x - lst[1].x)
             y = abs(lst[0].y - lst[1].y)
             length = sqrt(x * x + y * y) * 2.5 / 96
-            self.side_length.append(length)
+            self.sides_length.append(length)
 
 
 class NewRender:
@@ -56,7 +56,7 @@ class NewRender:
         self.line_color = [610, 10, 690, 90, self.current_triangle.color]
         self.default_lines = [self.line_color] + default_lines
 
-    def render_triangles(self):
+    def render_triangle(self):
         if len(self.current_triangle.lines) == 3:
             self.current_triangle.calculate_distance()
             self.triangles.append(self.current_triangle)
@@ -78,7 +78,7 @@ class NewRender:
                               self.current_triangle.lines[-1].start_pos.y),
                              (pos[0], pos[1]))
 
-    def clear_triangles(self):
+    def clear_triangle(self):
         self.triangles = []
 
     def reload_screen(self):
@@ -88,11 +88,11 @@ class NewRender:
         self.current_triangle.color = self.screen.get_at(pos)
         self.line_color[-1] = self.current_triangle.color
 
-    def render_rects(self):
+    def render_rect(self):
         for rect in self.rects:
             pygame.draw.rect(self.screen, rect[-1], (rect[0], rect[1], rect[2], rect[3]))
 
-    def render_default_lines(self):
+    def render_default_line(self):
         for line in self.default_lines:
             pygame.draw.line(self.screen, line[-1], (line[0], line[1]), (line[2], line[3]))
 
@@ -105,14 +105,14 @@ class NewRender:
         elif position[1] < 100 and position[0] < 600:
             self.get_color(position)
         if mouse_click[2] is True and len(self.current_triangle.lines) == 0:
-            self.clear_triangles()
+            self.clear_triangle()
             self.reload_screen()
 
     def update(self):
         self.reload_screen()
-        self.render_triangles()
+        self.render_triangle()
         self.render_current_triangle(pygame.mouse.get_pos())
-        self.render_rects()
-        self.render_default_lines()
+        self.render_rect()
+        self.render_default_line()
         self.clock.tick(self.FPS)
         pygame.display.update()
