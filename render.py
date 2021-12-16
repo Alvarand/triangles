@@ -43,11 +43,15 @@ class NewRender:
         self.screen.fill(GREY)
         self.FPS = FPS
         self.bg_color = GREY
+        self.rects = rects
+        self.line_color = [610, 10, 690, 90, self.current_triangle.color]
+        self.default_lines = [self.line_color] + default_lines
 
     def render_triangles(self):
         if len(self.current_triangle.lines) == 3:
             self.triangles.append(self.current_triangle)
             self.current_triangle = Triangle()
+            self.current_triangle.color = self.line_color[-1]
 
         for triangle in self.triangles:
             for line in triangle.lines:
@@ -72,6 +76,15 @@ class NewRender:
 
     def get_color(self, pos):
         self.current_triangle.color = self.screen.get_at(pos)
+        self.line_color[-1] = self.current_triangle.color
+
+    def render_rects(self):
+        for rect in self.rects:
+            pygame.draw.rect(self.screen, rect[-1], (rect[0], rect[1], rect[2], rect[3]))
+
+    def render_default_lines(self):
+        for line in self.default_lines:
+            pygame.draw.line(self.screen, line[-1], (line[0], line[1]), (line[2], line[3]))
 
     def click(self):
         mouse_click = pygame.mouse.get_pressed()
@@ -89,6 +102,8 @@ class NewRender:
         self.reload_screen()
         self.render_triangles()
         self.render_current_triangle(pygame.mouse.get_pos())
+        self.render_rects()
+        self.render_default_lines()
         self.clock.tick(self.FPS)
         pygame.display.update()
 
