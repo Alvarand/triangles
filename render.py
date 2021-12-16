@@ -3,6 +3,25 @@ from config import GREY, BLUE, WINDOW, rects, FPS, default_lines
 import copy
 
 
+class Coordinates:
+    def __init__(self, x=None, y=None):
+        self.x = x
+        self.y = y
+
+
+class Line:
+    def __init__(self, x=None, y=None):
+        self.start_pos = Coordinates(x, y)
+        self.end_pos = Coordinates()
+
+
+class Triangle:
+    def __init__(self):
+        self.line1 = Line()
+        self.line2 = Line()
+        self.line3 = Line()
+
+
 class Render:
 
     def __init__(self):
