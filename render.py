@@ -1,6 +1,6 @@
 import pygame
 from math import sqrt, acos, degrees
-from config import GREY, BLUE, WINDOW, rects, FPS, default_lines
+from config import BLUE, WINDOW, rects, FPS, default_lines
 
 
 class Coordinates:
@@ -60,12 +60,12 @@ class NewRender:
         self.current_triangle = Triangle()
         self.screen = pygame.display.set_mode(WINDOW)
         self.clock = pygame.time.Clock()
-        self.screen.fill(GREY)
         self.FPS = FPS
-        self.bg_color = GREY
+        self.bg_color = (202, 228, 241)  # GREY
         self.rects = rects
         self.line_color = [610, 10, 690, 90, self.current_triangle.color]
         self.default_lines = [self.line_color] + default_lines
+        self.last_pos = (0, 0)
 
     def render_triangle(self):
         if len(self.current_triangle.lines) == 3:
@@ -84,10 +84,17 @@ class NewRender:
             for line in self.current_triangle.lines[:-1]:
                 pygame.draw.line(self.screen, self.current_triangle.color, (line.start_pos.x, line.start_pos.y),
                                  (line.end_pos.x, line.end_pos.y))
-            pygame.draw.line(self.screen, self.current_triangle.color,
-                             (self.current_triangle.lines[-1].start_pos.x,
-                              self.current_triangle.lines[-1].start_pos.y),
-                             (pos[0], pos[1]))
+            if pos[1] > 100 and pos[0] < 400:
+                self.last_pos = pos
+                pygame.draw.line(self.screen, self.current_triangle.color,
+                                 (self.current_triangle.lines[-1].start_pos.x,
+                                  self.current_triangle.lines[-1].start_pos.y),
+                                 (pos[0], pos[1]))
+            else:
+                pygame.draw.line(self.screen, self.current_triangle.color,
+                                 (self.current_triangle.lines[-1].start_pos.x,
+                                  self.current_triangle.lines[-1].start_pos.y),
+                                 (self.last_pos[0], self.last_pos[1]))
 
     def clear_triangle(self):
         self.triangles = []
