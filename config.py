@@ -8,6 +8,10 @@ def random_color():
     return random.randint(0, 255), random.randint(0, 255), random.randint(0, 255)
 
 
+def random_position():
+    return random.randint(0, 399), random.randint(100, 512)
+
+
 running = True
 angle = 0
 WINDOW = WIDTH, HEIGHT = 700, 512
