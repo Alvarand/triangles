@@ -1,7 +1,8 @@
 import pygame
 from math import sqrt, acos, degrees
 from config import (BLUE, WINDOW, rects, FPS, default_lines,
-                    delete_button, add_button, font)
+                    delete_button, add_button, font,
+                    random_position)
 
 
 class Coordinates:
@@ -139,8 +140,16 @@ class NewRender:
                                  (self.last_pos[0], self.last_pos[1]))
 
     def add_random_triangle(self):
-        # TODO create random triangle
-        return
+        random_triangle = Triangle()
+        pos_1 = random_position()
+        pos_2 = random_position()
+        pos_3 = random_position()
+        for start, end in ([pos_1, pos_2], [pos_2, pos_3], [pos_3, pos_1]):
+            line = Line(start[0], start[1])
+            line.end_pos.x, line.end_pos.y = end[0], end[1]
+            random_triangle.lines.append(line)
+        random_triangle.color = self.line_color[-1]
+        self.triangles.append(random_triangle)
 
     def get_color(self, pos):
         # get color in current pixel
