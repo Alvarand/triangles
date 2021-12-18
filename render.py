@@ -88,83 +88,99 @@ class NewRender:
         self.text_clear = font.render('Clear', True, (180, 0, 0))
         self.text_plus = font.render('Add', True, (180, 0, 0))
 
+    def reload_screen(self):
+        # reloading screen and filling with grey color
+        self.screen.fill(self.bg_color)
+
+    def clear_triangle(self):
+        # clear triangles:[list]
+        self.triangles = []
+
+    def restart(self):
+        self.clear_triangle()
+        self.reload_screen()
+
     def render_triangle(self):
+
         if len(self.current_triangle.lines) == 3:
+            # if drew three lines, then calculating all metrics
             self.current_triangle.calculate_distance()
+
+            # then adding current triangle in triangles:[list]
             self.triangles.append(self.current_triangle)
+
+            # restarting current triangle
             self.current_triangle = Triangle()
             self.current_triangle.color = self.line_color[-1]
 
+        # rendering all triangles in triangles:[list]
         for triangle in self.triangles:
             for line in triangle.lines:
                 pygame.draw.line(self.screen, triangle.color, (line.start_pos.x, line.start_pos.y),
                                  (line.end_pos.x, line.end_pos.y))
 
     def render_current_triangle(self, pos):
+        # rendering current triangle
         if len(self.current_triangle.lines) > 0:
             for line in self.current_triangle.lines[:-1]:
                 pygame.draw.line(self.screen, self.current_triangle.color, (line.start_pos.x, line.start_pos.y),
                                  (line.end_pos.x, line.end_pos.y))
             if pos[1] > 100 and pos[0] < 400:
-                self.last_pos = pos
+                self.last_pos = pos  # remember current position
                 pygame.draw.line(self.screen, self.current_triangle.color,
                                  (self.current_triangle.lines[-1].start_pos.x,
                                   self.current_triangle.lines[-1].start_pos.y),
                                  (pos[0], pos[1]))
             else:
+                # draw line with last position if we leave screen
                 pygame.draw.line(self.screen, self.current_triangle.color,
                                  (self.current_triangle.lines[-1].start_pos.x,
                                   self.current_triangle.lines[-1].start_pos.y),
                                  (self.last_pos[0], self.last_pos[1]))
 
-    def restart(self):
-        self.clear_triangle()
-        self.reload_screen()
-
     def add_random_triangle(self):
         # TODO create random triangle
         return
 
-    def clear_triangle(self):
-        self.triangles = []
-
-    def reload_screen(self):
-        self.screen.fill(self.bg_color)
-
     def get_color(self, pos):
+        # get color in current pixel
         self.current_triangle.color = self.screen.get_at(pos)
         self.line_color[-1] = self.current_triangle.color
 
     def render_rect(self):
+        # rendering all default rectangles
         for rect in self.rects:
             pygame.draw.rect(self.screen, rect[-1], (rect[0], rect[1], rect[2], rect[3]))
 
     def render_button(self):
+        # rendering all buttons
         for button in self.buttons:
             button.draw(self.screen)
 
     def render_text(self):
+        # rendering default text
         self.screen.blit(self.text_clear, (403, 140))
         self.screen.blit(self.text_plus, (469, 140))
 
     def render_default_line(self):
+        # rendering default lines
         for line in self.default_lines:
             pygame.draw.line(self.screen, line[-1], (line[0], line[1]), (line[2], line[3]))
 
     def click(self):
         mouse_click = pygame.mouse.get_pressed()
         position = pygame.mouse.get_pos()
-        if position[1] > 100 and position[0] < 400:
-            if mouse_click[0] is True:
+        if mouse_click[0]:
+            if position[1] > 100 and position[0] < 400:
                 self.current_triangle.add_line(position)
-        elif position[1] > 100 and position[0] > 400:
-            for button in self.buttons:
-                if button.rect.collidepoint(position):
-                    button.do_it()
-        elif position[1] < 100 and position[0] < 600:
-            self.get_color(position)
-        if mouse_click[2] is True:
-            self.restart()
+            elif position[1] > 100 and position[0] > 400:
+                for button in self.buttons:
+                    if button.rect.collidepoint(position):
+                        button.do_it()
+            elif position[1] < 100 and position[0] < 600:
+                self.get_color(position)
+        # if mouse_click[2] is True:
+        #     self.restart()
 
     def update(self):
         self.reload_screen()
