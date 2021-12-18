@@ -41,4 +41,10 @@ rects = [[0, 0, 100, 100, RED],
          ]
 delete_button = pygame.image.load('image/delete.png')
 add_button = pygame.image.load('image/add.png')
+switch_button = pygame.image.load('image/switch.png')
 font = pygame.font.Font(None, 24)
+texts = [
+    [font.render('Clear', True, (180, 0, 0)), (405, 140)],
+    [font.render('Add', True, (180, 0, 0)), (470, 140)],
+    [font.render('Switch', True, (180, 0, 0)), (519, 140)]
+]

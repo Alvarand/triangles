@@ -1,8 +1,8 @@
 import pygame
 from math import sqrt, acos, degrees
 from config import (BLUE, WINDOW, rects, FPS, default_lines,
-                    delete_button, add_button, font,
-                    random_position)
+                    delete_button, add_button, switch_button,
+                    texts, random_position)
 
 
 class Coordinates:
@@ -84,10 +84,10 @@ class NewRender:
         self.line_color = [610, 10, 690, 90, self.current_triangle.color]
         self.default_lines = [self.line_color] + default_lines
         self.last_pos = (0, 0)
-        self.buttons = [Button(409, 103, delete_button, self.restart),
-                        Button(470, 103, add_button, self.add_random_triangle)]
-        self.text_clear = font.render('Clear', True, (180, 0, 0))
-        self.text_plus = font.render('Add', True, (180, 0, 0))
+        self.buttons = [Button(410, 103, delete_button, self.restart),
+                        Button(470, 103, add_button, self.add_random_triangle),
+                        Button(530, 103, switch_button, self.switch)]
+        self.texts = texts
 
     def reload_screen(self):
         # reloading screen and filling with grey color
@@ -151,6 +151,9 @@ class NewRender:
         random_triangle.color = self.line_color[-1]
         self.triangles.append(random_triangle)
 
+    def switch(self):
+        return
+
     def get_color(self, pos):
         # get color in current pixel
         self.current_triangle.color = self.screen.get_at(pos)
@@ -168,8 +171,8 @@ class NewRender:
 
     def render_text(self):
         # rendering default text
-        self.screen.blit(self.text_clear, (403, 140))
-        self.screen.blit(self.text_plus, (469, 140))
+        for text in self.texts:
+            self.screen.blit(text[0], text[1])
 
     def render_default_line(self):
         # rendering default lines
