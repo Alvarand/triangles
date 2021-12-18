@@ -1,6 +1,7 @@
 import pygame
 from math import sqrt, acos, degrees
-from config import BLUE, WINDOW, rects, FPS, default_lines
+from config import (BLUE, WINDOW, rects, FPS, default_lines,
+                    delete_button, add_button, font)
 
 
 class Coordinates:
@@ -53,6 +54,22 @@ class Triangle:
                 self.angles.append(0.0)
 
 
+class Button:
+    def __init__(self, x, y, image, func):
+        self.width = image.get_width()
+        self.height = image.get_height()
+        self.image = image
+        self.rect = self.image.get_rect()
+        self.rect.x, self.rect.y = x, y
+        self.func = func
+
+    def draw(self, screen):
+        screen.blit(self.image, (self.rect.x, self.rect.y))
+
+    def do_it(self):
+        self.func()
+
+
 class NewRender:
 
     def __init__(self):
@@ -66,6 +83,10 @@ class NewRender:
         self.line_color = [610, 10, 690, 90, self.current_triangle.color]
         self.default_lines = [self.line_color] + default_lines
         self.last_pos = (0, 0)
+        self.buttons = [Button(409, 103, delete_button, self.restart),
+                        Button(470, 103, add_button, self.add_random_triangle)]
+        self.text_clear = font.render('Clear', True, (180, 0, 0))
+        self.text_plus = font.render('Add', True, (180, 0, 0))
 
     def render_triangle(self):
         if len(self.current_triangle.lines) == 3:
@@ -96,6 +117,14 @@ class NewRender:
                                   self.current_triangle.lines[-1].start_pos.y),
                                  (self.last_pos[0], self.last_pos[1]))
 
+    def restart(self):
+        self.clear_triangle()
+        self.reload_screen()
+
+    def add_random_triangle(self):
+        # TODO create random triangle
+        return
+
     def clear_triangle(self):
         self.triangles = []
 
@@ -110,6 +139,14 @@ class NewRender:
         for rect in self.rects:
             pygame.draw.rect(self.screen, rect[-1], (rect[0], rect[1], rect[2], rect[3]))
 
+    def render_button(self):
+        for button in self.buttons:
+            button.draw(self.screen)
+
+    def render_text(self):
+        self.screen.blit(self.text_clear, (403, 140))
+        self.screen.blit(self.text_plus, (469, 140))
+
     def render_default_line(self):
         for line in self.default_lines:
             pygame.draw.line(self.screen, line[-1], (line[0], line[1]), (line[2], line[3]))
@@ -120,11 +157,14 @@ class NewRender:
         if position[1] > 100 and position[0] < 400:
             if mouse_click[0] is True:
                 self.current_triangle.add_line(position)
+        elif position[1] > 100 and position[0] > 400:
+            for button in self.buttons:
+                if button.rect.collidepoint(position):
+                    button.do_it()
         elif position[1] < 100 and position[0] < 600:
             self.get_color(position)
-        if mouse_click[2] is True and len(self.current_triangle.lines) == 0:
-            self.clear_triangle()
-            self.reload_screen()
+        if mouse_click[2] is True:
+            self.restart()
 
     def update(self):
         self.reload_screen()
@@ -132,5 +172,7 @@ class NewRender:
         self.render_current_triangle(pygame.mouse.get_pos())
         self.render_rect()
         self.render_default_line()
+        self.render_button()
+        self.render_text()
         self.clock.tick(self.FPS)
         pygame.display.update()

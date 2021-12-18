@@ -1,4 +1,7 @@
 import random
+import pygame
+
+pygame.font.init()
 
 
 def random_color():
@@ -32,3 +35,6 @@ rects = [[0, 0, 100, 100, RED],
          [400, 100, WIDTH - 400, HEIGHT - 100, WHITE],
          [601, 1, 99, 99, GREY]
          ]
+delete_button = pygame.image.load('image/delete.png')
+add_button = pygame.image.load('image/add.png')
+font = pygame.font.Font(None, 24)
