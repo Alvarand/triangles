@@ -46,8 +46,11 @@ class Triangle:
     def calculate_angle(self):
         len1, len2, len3 = self.sides_length
         for a, b, c in ([len1, len3, len2], [len2, len1, len3], [len3, len2, len1]):
-            angle = degrees(acos((a * a + b * b - c * c) / (2 * a * b)))
-            self.angles.append(angle)
+            try:
+                angle = degrees(acos((a * a + b * b - c * c) / (2 * a * b)))
+                self.angles.append(angle)
+            except ZeroDivisionError:
+                self.angles.append(0.0)
 
 
 class NewRender:
