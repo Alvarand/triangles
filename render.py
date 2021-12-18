@@ -84,9 +84,12 @@ class NewRender:
         self.line_color = [610, 10, 690, 90, self.current_triangle.color]
         self.default_lines = [self.line_color] + default_lines
         self.last_pos = (0, 0)
-        self.buttons = [Button(410, 103, delete_button, self.restart),
-                        Button(470, 103, add_button, self.add_random_triangle),
-                        Button(530, 103, switch_button, self.switch)]
+        self.buttons = [
+            Button(425, 103, delete_button, self.restart),
+            Button(500, 103, add_button, self.add_random_triangle),
+            Button(575, 103, add_button, self.add_random_line),
+            Button(650, 103, switch_button, self.switch),
+        ]
         self.texts = texts
 
     def reload_screen(self):
@@ -106,7 +109,6 @@ class NewRender:
         if len(self.current_triangle.lines) == 3:
             # if drew three lines, then calculating all metrics
             self.current_triangle.calculate_distance()
-
             # then adding current triangle in triangles:[list]
             self.triangles.append(self.current_triangle)
 
@@ -117,27 +119,37 @@ class NewRender:
         # rendering all triangles in triangles:[list]
         for triangle in self.triangles:
             for line in triangle.lines:
-                pygame.draw.line(self.screen, triangle.color, (line.start_pos.x, line.start_pos.y),
-                                 (line.end_pos.x, line.end_pos.y))
+                pygame.draw.line(
+                    self.screen, triangle.color,
+                    (line.start_pos.x, line.start_pos.y),
+                    (line.end_pos.x, line.end_pos.y)
+                )
 
     def render_current_triangle(self, pos):
         # rendering current triangle
         if len(self.current_triangle.lines) > 0:
             for line in self.current_triangle.lines[:-1]:
-                pygame.draw.line(self.screen, self.current_triangle.color, (line.start_pos.x, line.start_pos.y),
-                                 (line.end_pos.x, line.end_pos.y))
+                pygame.draw.line(
+                    self.screen, self.current_triangle.color,
+                    (line.start_pos.x, line.start_pos.y),
+                    (line.end_pos.x, line.end_pos.y)
+                )
             if pos[1] > 100 and pos[0] < 400:
                 self.last_pos = pos  # remember current position
-                pygame.draw.line(self.screen, self.current_triangle.color,
-                                 (self.current_triangle.lines[-1].start_pos.x,
-                                  self.current_triangle.lines[-1].start_pos.y),
-                                 (pos[0], pos[1]))
+                pygame.draw.line(
+                    self.screen, self.current_triangle.color,
+                    (self.current_triangle.lines[-1].start_pos.x,
+                     self.current_triangle.lines[-1].start_pos.y),
+                    (pos[0], pos[1])
+                )
             else:
                 # draw line with last position if we leave screen
-                pygame.draw.line(self.screen, self.current_triangle.color,
-                                 (self.current_triangle.lines[-1].start_pos.x,
-                                  self.current_triangle.lines[-1].start_pos.y),
-                                 (self.last_pos[0], self.last_pos[1]))
+                pygame.draw.line(
+                    self.screen, self.current_triangle.color,
+                    (self.current_triangle.lines[-1].start_pos.x,
+                     self.current_triangle.lines[-1].start_pos.y),
+                    (self.last_pos[0], self.last_pos[1])
+                )
 
     def add_random_triangle(self):
         random_triangle = Triangle()
@@ -149,7 +161,11 @@ class NewRender:
             line.end_pos.x, line.end_pos.y = end[0], end[1]
             random_triangle.lines.append(line)
         random_triangle.color = self.line_color[-1]
+        random_triangle.calculate_distance()
         self.triangles.append(random_triangle)
+
+    def add_random_line(self):
+        self.current_triangle.add_line(random_position())
 
     def switch(self):
         return
