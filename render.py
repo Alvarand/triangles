@@ -1,8 +1,9 @@
 import pygame
 from math import sqrt, acos, degrees
-from config import (BLUE, WINDOW, rects, FPS, default_lines,
+from config import (BLUE, WINDOW, rects, default_lines,
                     delete_button, add_button, switch_button,
-                    texts, random_position, draw)
+                    texts, random_position, draw,
+                    get_circle_range, get_cos)
 
 
 class Coordinates:
@@ -38,6 +39,7 @@ class Triangle:
 
     def calculate_distance(self):
         line1, line2, line3 = [line.start_pos for line in self.lines]
+        self.sides_length = []
         for a, b in ([line1, line2], [line2, line3], [line1, line3]):
             x = abs(a.x - b.x)
             y = abs(a.y - b.y)
@@ -46,10 +48,12 @@ class Triangle:
         self.calculate_angle()
 
     def calculate_angle(self):
+        self.angles = []
         len1, len2, len3 = self.sides_length
         for a, b, c in ([len1, len3, len2], [len2, len1, len3], [len3, len2, len1]):
             try:
-                angle = degrees(acos((a * a + b * b - c * c) / (2 * a * b)))
+                a_cos = get_cos((a * a + b * b - c * c) / (2 * a * b))
+                angle = degrees(acos(a_cos))
                 self.angles.append(angle)
             except ZeroDivisionError:
                 self.angles.append(0.0)
@@ -78,7 +82,6 @@ class NewRender:
         self.current_triangle = Triangle()
         self.screen = pygame.display.set_mode(WINDOW)
         self.clock = pygame.time.Clock()
-        self.FPS = FPS
         self.draw = draw
         self.bg_color = (202, 228, 241)  # GREY
         self.rects = rects
@@ -104,59 +107,6 @@ class NewRender:
     def restart(self):
         self.clear_triangle()
         self.reload_screen()
-
-    def render_triangle(self):
-
-        if len(self.current_triangle.lines) == 3:
-            # if drew three lines, then calculating all metrics
-            self.current_triangle.calculate_distance()
-            # then adding current triangle in triangles:[list]
-            self.triangles.append(self.current_triangle)
-
-            # restarting current triangle
-            self.current_triangle = Triangle()
-            self.current_triangle.color = self.line_color[-1]
-
-        # rendering all triangles in triangles:[list]
-        for triangle in self.triangles:
-            for line in triangle.lines:
-                pygame.draw.line(
-                    self.screen, triangle.color,
-                    (line.start_pos.x, line.start_pos.y),
-                    (line.end_pos.x, line.end_pos.y)
-                )
-                if not self.draw:
-                    pygame.draw.circle(
-                        self.screen, triangle.color,
-                        (line.start_pos.x, line.start_pos.y),
-                        5, width=1
-                    )
-
-    def render_current_triangle(self, pos):
-        # rendering current triangle
-        if len(self.current_triangle.lines) > 0:
-            for line in self.current_triangle.lines[:-1]:
-                pygame.draw.line(
-                    self.screen, self.current_triangle.color,
-                    (line.start_pos.x, line.start_pos.y),
-                    (line.end_pos.x, line.end_pos.y)
-                )
-            if pos[1] > 100 and pos[0] < 400:
-                self.last_pos = pos  # remember current position
-                pygame.draw.line(
-                    self.screen, self.current_triangle.color,
-                    (self.current_triangle.lines[-1].start_pos.x,
-                     self.current_triangle.lines[-1].start_pos.y),
-                    (pos[0], pos[1])
-                )
-            else:
-                # draw line with last position if we leave screen
-                pygame.draw.line(
-                    self.screen, self.current_triangle.color,
-                    (self.current_triangle.lines[-1].start_pos.x,
-                     self.current_triangle.lines[-1].start_pos.y),
-                    (self.last_pos[0], self.last_pos[1])
-                )
 
     def add_random_triangle(self):
         random_triangle = Triangle()
@@ -202,6 +152,85 @@ class NewRender:
         for line in self.default_lines:
             pygame.draw.line(self.screen, line[-1], (line[0], line[1]), (line[2], line[3]))
 
+    def render_current_circle(self, pos):
+        if not self.draw:
+            for triangle in self.triangles:
+                for line in triangle.lines:
+                    x_range, y_range = get_circle_range(line.start_pos.x, line.start_pos.y)
+                    if pos[0] in x_range and pos[1] in y_range:
+                        width = 0
+                    else:
+                        width = 1
+                    pygame.draw.circle(
+                        self.screen, triangle.color,
+                        (line.start_pos.x, line.start_pos.y),
+                        5, width=width
+                    )
+
+    def render_triangle(self):
+
+        if len(self.current_triangle.lines) == 3:
+            # if drew three lines, then calculating all metrics
+            self.current_triangle.calculate_distance()
+            # then adding current triangle in triangles:[list]
+            self.triangles.append(self.current_triangle)
+
+            # restarting current triangle
+            self.current_triangle = Triangle()
+            self.current_triangle.color = self.line_color[-1]
+
+        # rendering all triangles in triangles:[list]
+        for triangle in self.triangles:
+            for line in triangle.lines:
+                pygame.draw.line(
+                    self.screen, triangle.color,
+                    (line.start_pos.x, line.start_pos.y),
+                    (line.end_pos.x, line.end_pos.y)
+                )
+
+    def render_current_triangle(self, pos):
+        # rendering current triangle
+        if len(self.current_triangle.lines):
+            for line in self.current_triangle.lines[:-1]:
+                pygame.draw.line(
+                    self.screen, self.current_triangle.color,
+                    (line.start_pos.x, line.start_pos.y),
+                    (line.end_pos.x, line.end_pos.y)
+                )
+            if pos[1] > 100 and pos[0] < 400:
+                self.last_pos = pos  # remember current position
+                pygame.draw.line(
+                    self.screen, self.current_triangle.color,
+                    (self.current_triangle.lines[-1].start_pos.x,
+                     self.current_triangle.lines[-1].start_pos.y),
+                    (pos[0], pos[1])
+                )
+            else:
+                # draw line with last position if we leave screen
+                pygame.draw.line(
+                    self.screen, self.current_triangle.color,
+                    (self.current_triangle.lines[-1].start_pos.x,
+                     self.current_triangle.lines[-1].start_pos.y),
+                    (self.last_pos[0], self.last_pos[1])
+                )
+
+    def change_current_pos(self, pos):
+        mouse_click = pygame.mouse.get_pressed()
+
+        if not self.draw and mouse_click[0]:
+            for triangle in self.triangles:
+                for line in triangle.lines:
+                    if pos[0] < 400 and pos[1] > 100:
+                        x_range_start, y_range_start = get_circle_range(line.start_pos.x, line.start_pos.y)
+                        if pos[0] in x_range_start and pos[1] in y_range_start:
+                            line.start_pos.x = pos[0]
+                            line.start_pos.y = pos[1]
+                        x_range_end, y_range_end = get_circle_range(line.end_pos.x, line.end_pos.y)
+                        if pos[0] in x_range_end and pos[1] in y_range_end:
+                            line.end_pos.x = pos[0]
+                            line.end_pos.y = pos[1]
+                triangle.calculate_distance()
+
     def click(self):
         mouse_click = pygame.mouse.get_pressed()
         position = pygame.mouse.get_pos()
@@ -209,9 +238,6 @@ class NewRender:
             if self.draw:
                 if position[1] > 100 and position[0] < 400:
                     self.current_triangle.add_line(position)
-            else:
-                # TODO change position of current angle of triangle
-                pass
             if position[1] > 100 and position[0] > 400:
                 for button in self.buttons:
                     if button.rect.collidepoint(position):
@@ -224,10 +250,11 @@ class NewRender:
     def update(self):
         self.reload_screen()
         self.render_triangle()
+        self.render_current_circle(pygame.mouse.get_pos())
         self.render_current_triangle(pygame.mouse.get_pos())
         self.render_rect()
         self.render_default_line()
         self.render_button()
         self.render_text()
-        self.clock.tick(self.FPS)
+        self.change_current_pos(pygame.mouse.get_pos())
         pygame.display.update()

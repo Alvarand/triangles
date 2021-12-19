@@ -12,10 +12,19 @@ def random_position():
     return random.randint(0, 399), random.randint(100, 512)
 
 
+def get_circle_range(x, y):
+    x_range = range(x - 5, x + 5)
+    y_range = range(y - 5, y + 5)
+    return x_range, y_range
+
+
+def get_cos(cos_angle):
+    return min(1, max(cos_angle, -1))
+
+
 running = True
 draw = True
 WINDOW = WIDTH, HEIGHT = 700, 512
-FPS = 60
 GREY = (220, 220, 220)
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
