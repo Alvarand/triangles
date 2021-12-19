@@ -13,7 +13,7 @@ def random_position():
 
 
 running = True
-angle = 0
+draw = True
 WINDOW = WIDTH, HEIGHT = 700, 512
 FPS = 60
 GREY = (220, 220, 220)

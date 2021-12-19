@@ -2,7 +2,7 @@ import pygame
 from math import sqrt, acos, degrees
 from config import (BLUE, WINDOW, rects, FPS, default_lines,
                     delete_button, add_button, switch_button,
-                    texts, random_position)
+                    texts, random_position, draw)
 
 
 class Coordinates:
@@ -79,6 +79,7 @@ class NewRender:
         self.screen = pygame.display.set_mode(WINDOW)
         self.clock = pygame.time.Clock()
         self.FPS = FPS
+        self.draw = draw
         self.bg_color = (202, 228, 241)  # GREY
         self.rects = rects
         self.line_color = [610, 10, 690, 90, self.current_triangle.color]
@@ -124,6 +125,12 @@ class NewRender:
                     (line.start_pos.x, line.start_pos.y),
                     (line.end_pos.x, line.end_pos.y)
                 )
+                if not self.draw:
+                    pygame.draw.circle(
+                        self.screen, triangle.color,
+                        (line.start_pos.x, line.start_pos.y),
+                        5, width=1
+                    )
 
     def render_current_triangle(self, pos):
         # rendering current triangle
@@ -168,7 +175,7 @@ class NewRender:
         self.current_triangle.add_line(random_position())
 
     def switch(self):
-        return
+        self.draw = not self.draw
 
     def get_color(self, pos):
         # get color in current pixel
@@ -199,9 +206,13 @@ class NewRender:
         mouse_click = pygame.mouse.get_pressed()
         position = pygame.mouse.get_pos()
         if mouse_click[0]:
-            if position[1] > 100 and position[0] < 400:
-                self.current_triangle.add_line(position)
-            elif position[1] > 100 and position[0] > 400:
+            if self.draw:
+                if position[1] > 100 and position[0] < 400:
+                    self.current_triangle.add_line(position)
+            else:
+                # TODO change position of current angle of triangle
+                pass
+            if position[1] > 100 and position[0] > 400:
                 for button in self.buttons:
                     if button.rect.collidepoint(position):
                         button.do_it()
