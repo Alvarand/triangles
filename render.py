@@ -3,7 +3,8 @@ from math import sqrt, acos, degrees
 from config import (BLUE, WINDOW, rects, default_lines,
                     delete_button, add_button, switch_button,
                     texts, random_position, draw,
-                    get_circle_range, get_cos, radius)
+                    get_circle_range, get_cos, radius,
+                    font, corner_name, texts_for_triangle)
 
 
 class Coordinates:
@@ -127,6 +128,9 @@ class NewRender:
 
     def switch(self):
         self.draw = not self.draw
+        self.restart()
+        if not self.draw:
+            self.add_random_triangle()
 
     def get_color(self, pos):
         # get color in current pixel
@@ -147,6 +151,45 @@ class NewRender:
         # rendering default text
         for text in self.texts:
             self.screen.blit(text[0], text[1])
+        if not self.draw:
+            for text in texts_for_triangle:
+                self.screen.blit(text[0], text[1])
+            for triangle in self.triangles:
+                for corner, line in enumerate(triangle.lines):
+                    angles_text = [
+                        [
+                            font.render(
+                                corner_name[corner][0], True, (255, 0, 0)
+                            ),
+                            (line.start_pos.x - radius - 5, line.start_pos.y - radius - 5),
+                        ],
+                        [
+                            font.render(
+                                f'{corner_name[corner][0]}: ({line.start_pos.x}, {line.start_pos.y})', True, (0, 0, 0)
+                            ),
+                            (corner_name[corner][1]),
+                        ],
+                    ]
+                    for angle in angles_text:
+                        self.screen.blit(angle[0], angle[1])
+            for triangle in self.triangles:
+                for angle in range(3):
+                    angles_text = [
+                        [
+                            font.render(
+                                f'<{corner_name[angle][0]}: {triangle.angles[angle]:.2f}°', True, (0, 0, 0)
+                            ),
+                            (corner_name[angle][2]),
+                        ],
+                        [
+                            font.render(
+                                f'{corner_name[angle][3][0]}: {triangle.sides_length[angle]:.2f}', True, (0, 0, 0)
+                            ),
+                            (corner_name[angle][3][1])
+                        ]
+                    ]
+                    for corner in angles_text:
+                        self.screen.blit(corner[0], corner[1])
 
     def render_default_line(self):
         # rendering default lines
@@ -240,13 +283,14 @@ class NewRender:
                 if position[1] > 100 and position[0] < 400:
                     self.current_triangle.add_line(position)
             if position[1] > 100 and position[0] > 400:
-                for button in self.buttons:
-                    if button.rect.collidepoint(position):
-                        button.do_it()
+                if self.draw:
+                    for button in self.buttons[:-1]:
+                        if button.rect.collidepoint(position):
+                            button.do_it()
+                if self.buttons[-1].rect.collidepoint(position) and not len(self.current_triangle.lines):
+                    self.buttons[-1].do_it()
             elif position[1] < 100 and position[0] < 600:
                 self.get_color(position)
-        # if mouse_click[2] is True:
-        #     self.restart()
 
     def update(self):
         self.reload_screen()
@@ -256,6 +300,6 @@ class NewRender:
         self.render_rect()
         self.render_default_line()
         self.render_button()
-        self.render_text()
         self.change_current_pos(pygame.mouse.get_pos())
+        self.render_text()
         pygame.display.update()

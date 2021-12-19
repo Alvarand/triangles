@@ -58,6 +58,12 @@ delete_button = pygame.image.load('image/delete.png')
 add_button = pygame.image.load('image/add.png')
 switch_button = pygame.image.load('image/switch.png')
 
+corner_name = {
+    0: ['A', (422, 200), (422, 300), ['AB', (422, 400)]],
+    1: ['B', (422, 220), (422, 320), ['BC', (422, 420)]],
+    2: ['C', (422, 240), (422, 340), ['AC', (422, 440)]],
+}
+
 font = pygame.font.Font(None, 24)
 texts = [
     [font.render('clear', True, (180, 0, 0)), (422, 145)],
@@ -66,4 +72,9 @@ texts = [
     [font.render('add', True, (180, 0, 0)), (575, 137)],
     [font.render('line', True, (180, 0, 0)), (577, 152)],
     [font.render('switch', True, (180, 0, 0)), (638, 145)],
+]
+texts_for_triangle = [
+    [font.render('Points', True, BLACK), (422, 180)],
+    [font.render('Angles', True, BLACK), (422, 280)],
+    [font.render('Length', True, BLACK), (422, 380)],
 ]
