@@ -13,8 +13,8 @@ def random_position():
 
 
 def get_circle_range(x, y):
-    x_range = range(x - 5, x + 5)
-    y_range = range(y - 5, y + 5)
+    x_range = range(x - radius, x + radius)
+    y_range = range(y - radius, y + radius)
     return x_range, y_range
 
 
@@ -24,6 +24,7 @@ def get_cos(cos_angle):
 
 running = True
 draw = True
+radius = 15
 WINDOW = WIDTH, HEIGHT = 700, 512
 GREY = (220, 220, 220)
 BLACK = (0, 0, 0)

@@ -3,7 +3,7 @@ from math import sqrt, acos, degrees
 from config import (BLUE, WINDOW, rects, default_lines,
                     delete_button, add_button, switch_button,
                     texts, random_position, draw,
-                    get_circle_range, get_cos)
+                    get_circle_range, get_cos, radius)
 
 
 class Coordinates:
@@ -81,6 +81,7 @@ class NewRender:
         self.triangles = []
         self.current_triangle = Triangle()
         self.screen = pygame.display.set_mode(WINDOW)
+        pygame.display.set_caption('Triangles')
         self.clock = pygame.time.Clock()
         self.draw = draw
         self.bg_color = (202, 228, 241)  # GREY
@@ -164,7 +165,7 @@ class NewRender:
                     pygame.draw.circle(
                         self.screen, triangle.color,
                         (line.start_pos.x, line.start_pos.y),
-                        5, width=width
+                        radius, width=width
                     )
 
     def render_triangle(self):
