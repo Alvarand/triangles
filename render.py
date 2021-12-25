@@ -4,7 +4,7 @@ from config import (BLUE, WINDOW, rects, default_lines,
                     delete_button, add_button, switch_button,
                     texts, random_position, draw,
                     get_circle_range, get_cos, radius,
-                    font, corner_name, texts_for_triangle)
+                    font, corner_name, texts_for_polygon)
 
 
 class Coordinates:
@@ -22,7 +22,7 @@ class Line:
 
 
 class Polygon:
-    def __init__(self, n=4):
+    def __init__(self, n=5):
         self.count_angles = n
         self.lines = []
         self.color = BLUE
@@ -40,25 +40,27 @@ class Polygon:
             self.lines[-1].end_pos.y = self.lines[0].start_pos.y
 
     def calculate_distance(self):
-        line1, line2, line3, line4 = [line.start_pos for line in self.lines]
+        lines = [line.start_pos for line in self.lines]
         self.sides_length = []
-        for a, b in ([line1, line2], [line2, line3], [line1, line3]):
-            x = abs(a.x - b.x)
-            y = abs(a.y - b.y)
+        lines_length = len(lines)
+        for i in range(lines_length):
+            x = abs(lines[i].x - lines[(i + 1) % lines_length].x)
+            y = abs(lines[i].y - lines[(i + 1) % lines_length].y)
             length = sqrt(x * x + y * y) * 2.5 / 96
             self.sides_length.append(length)
+        print(self.sides_length)
         self.calculate_angle()
 
     def calculate_angle(self):
         self.angles = []
-        len1, len2, len3 = self.sides_length
-        for a, b, c in ([len1, len3, len2], [len2, len1, len3], [len3, len2, len1]):
-            try:
-                a_cos = get_cos((a * a + b * b - c * c) / (2 * a * b))
-                angle = degrees(acos(a_cos))
-                self.angles.append(angle)
-            except ZeroDivisionError:
-                self.angles.append(0.0)
+        # lens = self.sides_length
+        # for a, b, c in ([len1, len3, len2], [len2, len1, len3], [len3, len2, len1]):
+        #     try:
+        #         a_cos = get_cos((a * a + b * b - c * c) / (2 * a * b))
+        #         angle = degrees(acos(a_cos))
+        #         self.angles.append(angle)
+        #     except ZeroDivisionError:
+        #         self.angles.append(0.0)
 
 
 class Button:
@@ -80,20 +82,20 @@ class Button:
 class NewRender:
 
     def __init__(self):
-        self.triangles = []
-        self.current_triangle = Polygon()
+        self.polygons = []
+        self.current_polygon = Polygon()
         self.screen = pygame.display.set_mode(WINDOW)
-        pygame.display.set_caption('Triangles')
+        pygame.display.set_caption('Polygons')
         self.clock = pygame.time.Clock()
         self.draw = draw
         self.bg_color = (202, 228, 241)  # GREY
         self.rects = rects
-        self.line_color = [610, 10, 690, 90, self.current_triangle.color]
+        self.line_color = [610, 10, 690, 90, self.current_polygon.color]
         self.default_lines = [self.line_color] + default_lines
         self.last_pos = (0, 0)
         self.buttons = [
             Button(425, 103, delete_button, self.restart),
-            Button(500, 103, add_button, self.add_random_triangle),
+            Button(500, 103, add_button, self.add_random_polygon),
             Button(575, 103, add_button, self.add_random_line),
             Button(650, 103, switch_button, self.switch),
         ]
@@ -103,40 +105,39 @@ class NewRender:
         # reloading screen and filling with grey color
         self.screen.fill(self.bg_color)
 
-    def clear_triangle(self):
-        # clear triangles:[list]
-        self.triangles = []
+    def clear_polygon(self):
+        # clear polygons:[list]
+        self.polygons = []
 
     def restart(self):
-        self.clear_triangle()
+        self.clear_polygon()
         self.reload_screen()
 
-    def add_random_triangle(self):
-        random_triangle = Polygon()
-        pos_1 = random_position()
-        pos_2 = random_position()
-        pos_3 = random_position()
-        for start, end in ([pos_1, pos_2], [pos_2, pos_3], [pos_3, pos_1]):
-            line = Line(start[0], start[1])
-            line.end_pos.x, line.end_pos.y = end[0], end[1]
-            random_triangle.lines.append(line)
-        random_triangle.color = self.line_color[-1]
-        random_triangle.calculate_distance()
-        self.triangles.append(random_triangle)
+    def add_random_polygon(self):
+        random_polygon = Polygon()
+        positions = [random_position() for _ in range(random_polygon.count_angles)]
+        for i in range(random_polygon.count_angles):
+            line = Line(positions[i][0], positions[i][1])
+            line.end_pos.x = positions[(i + 1) % random_polygon.count_angles][0]
+            line.end_pos.y = positions[(i + 1) % random_polygon.count_angles][1]
+            random_polygon.lines.append(line)
+        random_polygon.color = self.line_color[-1]
+        random_polygon.calculate_distance()
+        self.polygons.append(random_polygon)
 
     def add_random_line(self):
-        self.current_triangle.add_line(random_position())
+        self.current_polygon.add_line(random_position())
 
     def switch(self):
         self.draw = not self.draw
         self.restart()
         if not self.draw:
-            self.add_random_triangle()
+            self.add_random_polygon()
 
     def get_color(self, pos):
         # get color in current pixel
-        self.current_triangle.color = self.screen.get_at(pos)
-        self.line_color[-1] = self.current_triangle.color
+        self.current_polygon.color = self.screen.get_at(pos)
+        self.line_color[-1] = self.current_polygon.color
 
     def render_rect(self):
         # rendering all default rectangles
@@ -153,10 +154,10 @@ class NewRender:
         for text in self.texts:
             self.screen.blit(text[0], text[1])
         if not self.draw:
-            for text in texts_for_triangle:
+            for text in texts_for_polygon:
                 self.screen.blit(text[0], text[1])
-            for triangle in self.triangles:
-                for corner, line in enumerate(triangle.lines):
+            for polygon in self.polygons:
+                for corner, line in enumerate(polygon.lines):
                     angles_text = [
                         [
                             font.render(
@@ -173,18 +174,18 @@ class NewRender:
                     ]
                     for angle in angles_text:
                         self.screen.blit(angle[0], angle[1])
-            for triangle in self.triangles:
+            for polygon in self.polygons:
                 for angle in range(3):
                     angles_text = [
                         [
                             font.render(
-                                f'<{corner_name[angle][0]}: {triangle.angles[angle]:.2f}°', True, (0, 0, 0)
+                                f'<{corner_name[angle][0]}: {polygon.angles[angle]:.2f}°', True, (0, 0, 0)
                             ),
                             (corner_name[angle][2]),
                         ],
                         [
                             font.render(
-                                f'{corner_name[angle][3][0]}: {triangle.sides_length[angle]:.2f}', True, (0, 0, 0)
+                                f'{corner_name[angle][3][0]}: {polygon.sides_length[angle]:.2f}', True, (0, 0, 0)
                             ),
                             (corner_name[angle][3][1])
                         ]
@@ -199,63 +200,63 @@ class NewRender:
 
     def render_current_circle(self, pos):
         if not self.draw:
-            for triangle in self.triangles:
-                for line in triangle.lines:
+            for polygon in self.polygons:
+                for line in polygon.lines:
                     x_range, y_range = get_circle_range(line.start_pos.x, line.start_pos.y)
                     if pos[0] in x_range and pos[1] in y_range:
                         width = 0
                     else:
                         width = 1
                     pygame.draw.circle(
-                        self.screen, triangle.color,
+                        self.screen, polygon.color,
                         (line.start_pos.x, line.start_pos.y),
                         radius, width=width
                     )
 
-    def render_triangle(self):
+    def render_polygon(self):
 
-        if len(self.current_triangle.lines) == 4:
+        if len(self.current_polygon.lines) == self.current_polygon.count_angles:
             # if drew three lines, then calculating all metrics
-            self.current_triangle.calculate_distance()
-            # then adding current triangle in triangles:[list]
-            self.triangles.append(self.current_triangle)
+            self.current_polygon.calculate_distance()
+            # then adding current polygon in polygons:[list]
+            self.polygons.append(self.current_polygon)
 
-            # restarting current triangle
-            self.current_triangle = Polygon()
-            self.current_triangle.color = self.line_color[-1]
+            # restarting current polygon
+            self.current_polygon = Polygon()
+            self.current_polygon.color = self.line_color[-1]
 
-        # rendering all triangles in triangles:[list]
-        for triangle in self.triangles:
-            for line in triangle.lines:
+        # rendering all polygons in polygons:[list]
+        for polygon in self.polygons:
+            for line in polygon.lines:
                 pygame.draw.line(
-                    self.screen, triangle.color,
+                    self.screen, polygon.color,
                     (line.start_pos.x, line.start_pos.y),
                     (line.end_pos.x, line.end_pos.y)
                 )
 
-    def render_current_triangle(self, pos):
-        # rendering current triangle
-        if len(self.current_triangle.lines):
-            for line in self.current_triangle.lines[:-1]:
+    def render_current_polygon(self, pos):
+        # rendering current polygon
+        if len(self.current_polygon.lines):
+            for line in self.current_polygon.lines[:-1]:
                 pygame.draw.line(
-                    self.screen, self.current_triangle.color,
+                    self.screen, self.current_polygon.color,
                     (line.start_pos.x, line.start_pos.y),
                     (line.end_pos.x, line.end_pos.y)
                 )
             if pos[1] > 100 and pos[0] < 400:
                 self.last_pos = pos  # remember current position
                 pygame.draw.line(
-                    self.screen, self.current_triangle.color,
-                    (self.current_triangle.lines[-1].start_pos.x,
-                     self.current_triangle.lines[-1].start_pos.y),
+                    self.screen, self.current_polygon.color,
+                    (self.current_polygon.lines[-1].start_pos.x,
+                     self.current_polygon.lines[-1].start_pos.y),
                     (pos[0], pos[1])
                 )
             else:
                 # draw line with last position if we leave screen
                 pygame.draw.line(
-                    self.screen, self.current_triangle.color,
-                    (self.current_triangle.lines[-1].start_pos.x,
-                     self.current_triangle.lines[-1].start_pos.y),
+                    self.screen, self.current_polygon.color,
+                    (self.current_polygon.lines[-1].start_pos.x,
+                     self.current_polygon.lines[-1].start_pos.y),
                     (self.last_pos[0], self.last_pos[1])
                 )
 
@@ -263,8 +264,8 @@ class NewRender:
         mouse_click = pygame.mouse.get_pressed()
 
         if not self.draw and mouse_click[0]:
-            for triangle in self.triangles:
-                for line in triangle.lines:
+            for polygon in self.polygons:
+                for line in polygon.lines:
                     if pos[0] < 400 and pos[1] > 100:
                         x_range_start, y_range_start = get_circle_range(line.start_pos.x, line.start_pos.y)
                         if pos[0] in x_range_start and pos[1] in y_range_start:
@@ -274,7 +275,7 @@ class NewRender:
                         if pos[0] in x_range_end and pos[1] in y_range_end:
                             line.end_pos.x = pos[0]
                             line.end_pos.y = pos[1]
-                triangle.calculate_distance()
+                polygon.calculate_distance()
 
     def click(self):
         mouse_click = pygame.mouse.get_pressed()
@@ -282,22 +283,22 @@ class NewRender:
         if mouse_click[0]:
             if self.draw:
                 if position[1] > 100 and position[0] < 400:
-                    self.current_triangle.add_line(position)
+                    self.current_polygon.add_line(position)
             if position[1] > 100 and position[0] > 400:
                 if self.draw:
                     for button in self.buttons[:-1]:
                         if button.rect.collidepoint(position):
                             button.do_it()
-                if self.buttons[-1].rect.collidepoint(position) and not len(self.current_triangle.lines):
+                if self.buttons[-1].rect.collidepoint(position) and not len(self.current_polygon.lines):
                     self.buttons[-1].do_it()
             elif position[1] < 100 and position[0] < 600:
                 self.get_color(position)
 
     def update(self):
         self.reload_screen()
-        self.render_triangle()
+        self.render_polygon()
         self.render_current_circle(pygame.mouse.get_pos())
-        self.render_current_triangle(pygame.mouse.get_pos())
+        self.render_current_polygon(pygame.mouse.get_pos())
         self.render_rect()
         self.render_default_line()
         self.render_button()

@@ -68,12 +68,12 @@ font = pygame.font.Font(None, 24)
 texts = [
     [font.render('clear', True, (180, 0, 0)), (422, 145)],
     [font.render('add', True, (180, 0, 0)), (500, 137)],
-    [font.render('triangle', True, (180, 0, 0)), (485, 152)],
+    [font.render('polygon', True, (180, 0, 0)), (485, 152)],
     [font.render('add', True, (180, 0, 0)), (575, 137)],
     [font.render('line', True, (180, 0, 0)), (577, 152)],
     [font.render('switch', True, (180, 0, 0)), (638, 145)],
 ]
-texts_for_triangle = [
+texts_for_polygon = [
     [font.render('Points', True, BLACK), (422, 180)],
     [font.render('Angles', True, BLACK), (422, 280)],
     [font.render('Length', True, BLACK), (422, 380)],
