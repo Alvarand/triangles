@@ -4,7 +4,7 @@ from config import (BLUE, WINDOW, rects, default_lines,
                     delete_button, add_button, switch_button,
                     texts, random_position, draw,
                     get_circle_range, get_cos, radius,
-                    font, corner_name, texts_for_polygon)
+                    font, texts_for_polygon)
 
 
 class Coordinates:
@@ -22,12 +22,29 @@ class Line:
 
 
 class Polygon:
-    def __init__(self, n=5):
+
+    def __init__(self, n=6):
         self.count_angles = n
         self.lines = []
         self.color = BLUE
         self.sides_length = []
         self.angles = []
+        self.corner_name = dict()
+        for i in range(self.count_angles):
+            if i == self.count_angles - 1:
+                self.corner_name[i] = [
+                    f'{chr(65 + i)}',
+                    (422, 200 + i * 20),
+                    (422, 300 + i * 20),
+                    [f'A{chr(65 + i)}', (422, 400 + i * 20)]
+                ]
+            else:
+                self.corner_name[i] = [
+                    f'{chr(65 + i)}',
+                    (422, 200 + i * 20),
+                    (422, 300 + i * 20),
+                    [f'{chr(65 + i)}{chr(65 + i + 1)}', (422, 400 + i * 20)]
+                ]
 
     def add_line(self, pos):
         self.lines.append(Line(pos[0], pos[1]))
@@ -42,25 +59,31 @@ class Polygon:
     def calculate_distance(self):
         lines = [line.start_pos for line in self.lines]
         self.sides_length = []
-        lines_length = len(lines)
-        for i in range(lines_length):
-            x = abs(lines[i].x - lines[(i + 1) % lines_length].x)
-            y = abs(lines[i].y - lines[(i + 1) % lines_length].y)
+        for current_angle in range(self.count_angles):
+            x = abs(lines[current_angle].x - lines[(current_angle + 1) % self.count_angles].x)
+            y = abs(lines[current_angle].y - lines[(current_angle + 1) % self.count_angles].y)
             length = sqrt(x * x + y * y) * 2.5 / 96
             self.sides_length.append(length)
-        print(self.sides_length)
         self.calculate_angle()
 
     def calculate_angle(self):
         self.angles = []
-        # lens = self.sides_length
-        # for a, b, c in ([len1, len3, len2], [len2, len1, len3], [len3, len2, len1]):
-        #     try:
-        #         a_cos = get_cos((a * a + b * b - c * c) / (2 * a * b))
-        #         angle = degrees(acos(a_cos))
-        #         self.angles.append(angle)
-        #     except ZeroDivisionError:
-        #         self.angles.append(0.0)
+        for current_angle in range(self.count_angles):
+            try:
+                a = self.sides_length[current_angle]
+                b = self.sides_length[(current_angle - 1 + self.count_angles) % self.count_angles]
+                x = abs(
+                    self.lines[(current_angle - 1 + self.count_angles) % self.count_angles].start_pos.x - self.lines[
+                        (current_angle + 1) % self.count_angles].start_pos.x)
+                y = abs(
+                    self.lines[(current_angle - 1 + self.count_angles) % self.count_angles].start_pos.y - self.lines[
+                        (current_angle + 1) % self.count_angles].start_pos.y)
+                c = sqrt(x * x + y * y) * 2.5 / 96
+                a_cos = get_cos((a * a + b * b - c * c) / (2 * a * b))
+                angle = degrees(acos(a_cos))
+                self.angles.append(angle)
+            except ZeroDivisionError:
+                self.angles.append(0.0)
 
 
 class Button:
@@ -93,6 +116,7 @@ class NewRender:
         self.line_color = [610, 10, 690, 90, self.current_polygon.color]
         self.default_lines = [self.line_color] + default_lines
         self.last_pos = (0, 0)
+        self.count_current_angles = self.current_polygon.count_angles
         self.buttons = [
             Button(425, 103, delete_button, self.restart),
             Button(500, 103, add_button, self.add_random_polygon),
@@ -161,33 +185,35 @@ class NewRender:
                     angles_text = [
                         [
                             font.render(
-                                corner_name[corner][0], True, (255, 0, 0)
+                                polygon.corner_name[corner][0], True, (255, 0, 0)
                             ),
                             (line.start_pos.x - radius - 5, line.start_pos.y - radius - 5),
                         ],
                         [
                             font.render(
-                                f'{corner_name[corner][0]}: ({line.start_pos.x}, {line.start_pos.y})', True, (0, 0, 0)
+                                f'{polygon.corner_name[corner][0]}: ({line.start_pos.x}, {line.start_pos.y})', True,
+                                (0, 0, 0)
                             ),
-                            (corner_name[corner][1]),
+                            (polygon.corner_name[corner][1]),
                         ],
                     ]
                     for angle in angles_text:
                         self.screen.blit(angle[0], angle[1])
             for polygon in self.polygons:
-                for angle in range(3):
+                for angle in range(self.count_current_angles):
                     angles_text = [
                         [
                             font.render(
-                                f'<{corner_name[angle][0]}: {polygon.angles[angle]:.2f}°', True, (0, 0, 0)
+                                f'<{polygon.corner_name[angle][0]}: {polygon.angles[angle]:.2f}°', True, (0, 0, 0)
                             ),
-                            (corner_name[angle][2]),
+                            (polygon.corner_name[angle][2]),
                         ],
                         [
                             font.render(
-                                f'{corner_name[angle][3][0]}: {polygon.sides_length[angle]:.2f}', True, (0, 0, 0)
+                                f'{polygon.corner_name[angle][3][0]}: {polygon.sides_length[angle]:.2f}', True,
+                                (0, 0, 0)
                             ),
-                            (corner_name[angle][3][1])
+                            (polygon.corner_name[angle][3][1])
                         ]
                     ]
                     for corner in angles_text:
