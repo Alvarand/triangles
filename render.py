@@ -21,9 +21,9 @@ class Line:
         self.end_pos = Coordinates()
 
 
-class Triangle:
-
-    def __init__(self):
+class Polygon:
+    def __init__(self, n=4):
+        self.count_angles = n
         self.lines = []
         self.color = BLUE
         self.sides_length = []
@@ -31,15 +31,16 @@ class Triangle:
 
     def add_line(self, pos):
         self.lines.append(Line(pos[0], pos[1]))
+
         if len(self.lines) != 1:
             self.lines[len(self.lines) - 2].end_pos.x = pos[0]
             self.lines[len(self.lines) - 2].end_pos.y = pos[1]
-        if len(self.lines) == 3:
+        if len(self.lines) == self.count_angles:
             self.lines[-1].end_pos.x = self.lines[0].start_pos.x
             self.lines[-1].end_pos.y = self.lines[0].start_pos.y
 
     def calculate_distance(self):
-        line1, line2, line3 = [line.start_pos for line in self.lines]
+        line1, line2, line3, line4 = [line.start_pos for line in self.lines]
         self.sides_length = []
         for a, b in ([line1, line2], [line2, line3], [line1, line3]):
             x = abs(a.x - b.x)
@@ -80,7 +81,7 @@ class NewRender:
 
     def __init__(self):
         self.triangles = []
-        self.current_triangle = Triangle()
+        self.current_triangle = Polygon()
         self.screen = pygame.display.set_mode(WINDOW)
         pygame.display.set_caption('Triangles')
         self.clock = pygame.time.Clock()
@@ -111,7 +112,7 @@ class NewRender:
         self.reload_screen()
 
     def add_random_triangle(self):
-        random_triangle = Triangle()
+        random_triangle = Polygon()
         pos_1 = random_position()
         pos_2 = random_position()
         pos_3 = random_position()
@@ -213,14 +214,14 @@ class NewRender:
 
     def render_triangle(self):
 
-        if len(self.current_triangle.lines) == 3:
+        if len(self.current_triangle.lines) == 4:
             # if drew three lines, then calculating all metrics
             self.current_triangle.calculate_distance()
             # then adding current triangle in triangles:[list]
             self.triangles.append(self.current_triangle)
 
             # restarting current triangle
-            self.current_triangle = Triangle()
+            self.current_triangle = Polygon()
             self.current_triangle.color = self.line_color[-1]
 
         # rendering all triangles in triangles:[list]
