@@ -23,7 +23,7 @@ class Line:
 
 class Polygon:
 
-    def __init__(self, n=6):
+    def __init__(self, n=3):
         self.count_angles = n
         self.lines = []
         self.color = BLUE
@@ -56,13 +56,18 @@ class Polygon:
             self.lines[-1].end_pos.x = self.lines[0].start_pos.x
             self.lines[-1].end_pos.y = self.lines[0].start_pos.y
 
-    def calculate_distance(self):
+    @staticmethod
+    def calculate_distance(pos1, pos2):
+        x = abs(pos1.x - pos2.x)
+        y = abs(pos1.y - pos2.y)
+        length = sqrt(x * x + y * y) * 2.5 / 96
+        return length
+
+    def calculate_length(self):
         lines = [line.start_pos for line in self.lines]
         self.sides_length = []
         for current_angle in range(self.count_angles):
-            x = abs(lines[current_angle].x - lines[(current_angle + 1) % self.count_angles].x)
-            y = abs(lines[current_angle].y - lines[(current_angle + 1) % self.count_angles].y)
-            length = sqrt(x * x + y * y) * 2.5 / 96
+            length = self.calculate_distance(lines[current_angle], lines[(current_angle + 1) % self.count_angles])
             self.sides_length.append(length)
         self.calculate_angle()
 
@@ -72,13 +77,10 @@ class Polygon:
             try:
                 a = self.sides_length[current_angle]
                 b = self.sides_length[(current_angle - 1 + self.count_angles) % self.count_angles]
-                x = abs(
-                    self.lines[(current_angle - 1 + self.count_angles) % self.count_angles].start_pos.x - self.lines[
-                        (current_angle + 1) % self.count_angles].start_pos.x)
-                y = abs(
-                    self.lines[(current_angle - 1 + self.count_angles) % self.count_angles].start_pos.y - self.lines[
-                        (current_angle + 1) % self.count_angles].start_pos.y)
-                c = sqrt(x * x + y * y) * 2.5 / 96
+                c = self.calculate_distance(
+                    self.lines[(current_angle - 1 + self.count_angles) % self.count_angles].start_pos,
+                    self.lines[(current_angle + 1) % self.count_angles].start_pos
+                )
                 a_cos = get_cos((a * a + b * b - c * c) / (2 * a * b))
                 angle = degrees(acos(a_cos))
                 self.angles.append(angle)
@@ -146,7 +148,7 @@ class NewRender:
             line.end_pos.y = positions[(i + 1) % random_polygon.count_angles][1]
             random_polygon.lines.append(line)
         random_polygon.color = self.line_color[-1]
-        random_polygon.calculate_distance()
+        random_polygon.calculate_length()
         self.polygons.append(random_polygon)
 
     def add_random_line(self):
@@ -243,7 +245,7 @@ class NewRender:
 
         if len(self.current_polygon.lines) == self.current_polygon.count_angles:
             # if drew three lines, then calculating all metrics
-            self.current_polygon.calculate_distance()
+            self.current_polygon.calculate_length()
             # then adding current polygon in polygons:[list]
             self.polygons.append(self.current_polygon)
 
@@ -301,7 +303,7 @@ class NewRender:
                         if pos[0] in x_range_end and pos[1] in y_range_end:
                             line.end_pos.x = pos[0]
                             line.end_pos.y = pos[1]
-                polygon.calculate_distance()
+                polygon.calculate_length()
 
     def click(self):
         mouse_click = pygame.mouse.get_pressed()
