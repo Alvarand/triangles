@@ -25,7 +25,7 @@ def get_cos(cos_angle):
 running = True
 draw = True
 radius = 15
-WINDOW = WIDTH, HEIGHT = 700, 512
+WINDOW = WIDTH, HEIGHT = 700, 612
 GREY = (220, 220, 220)
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
@@ -67,9 +67,4 @@ texts = [
     [font.render('add', True, (180, 0, 0)), (575, 137)],
     [font.render('line', True, (180, 0, 0)), (577, 152)],
     [font.render('switch', True, (180, 0, 0)), (638, 145)],
-]
-texts_for_polygon = [
-    [font.render('Points', True, BLACK), (422, 180)],
-    [font.render('Angles', True, BLACK), (422, 280)],
-    [font.render('Length', True, BLACK), (422, 380)],
 ]

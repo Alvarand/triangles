@@ -1,10 +1,10 @@
 import pygame
 from math import sqrt, acos, degrees
-from config import (BLUE, WINDOW, rects, default_lines,
+from config import (BLUE, BLACK, WINDOW, rects, default_lines,
                     delete_button, add_button, switch_button,
                     texts, random_position, draw,
                     get_circle_range, get_cos, radius,
-                    font, texts_for_polygon)
+                    font)
 
 
 class Coordinates:
@@ -23,27 +23,32 @@ class Line:
 
 class Polygon:
 
-    def __init__(self, n=3):
+    def __init__(self, n=4):
         self.count_angles = n
         self.lines = []
         self.color = BLUE
         self.sides_length = []
         self.angles = []
         self.corner_name = dict()
+        self.texts_for_polygon = [
+            [font.render('Points', True, BLACK), (422, 180)],
+            [font.render('Angles', True, BLACK), (422, 200 + 20 * self.count_angles)],
+            [font.render('Length', True, BLACK), (422, 220 + 40 * self.count_angles)],
+        ]
         for i in range(self.count_angles):
             if i == self.count_angles - 1:
                 self.corner_name[i] = [
                     f'{chr(65 + i)}',
                     (422, 200 + i * 20),
-                    (422, 300 + i * 20),
-                    [f'A{chr(65 + i)}', (422, 400 + i * 20)]
+                    (422, 200 + 20 * (self.count_angles + 1) + i * 20),
+                    [f'A{chr(65 + i)}', (422, 200 + 40 * (self.count_angles + 1) + i * 20)]
                 ]
             else:
                 self.corner_name[i] = [
                     f'{chr(65 + i)}',
                     (422, 200 + i * 20),
-                    (422, 300 + i * 20),
-                    [f'{chr(65 + i)}{chr(65 + i + 1)}', (422, 400 + i * 20)]
+                    (422, 200 + 20 * (self.count_angles + 1) + i * 20),
+                    [f'{chr(65 + i)}{chr(65 + i + 1)}', (422, 200 + 40 * (self.count_angles + 1) + i * 20)]
                 ]
 
     def add_line(self, pos):
@@ -180,7 +185,7 @@ class NewRender:
         for text in self.texts:
             self.screen.blit(text[0], text[1])
         if not self.draw:
-            for text in texts_for_polygon:
+            for text in self.polygons[0].texts_for_polygon:
                 self.screen.blit(text[0], text[1])
             for polygon in self.polygons:
                 for corner, line in enumerate(polygon.lines):
