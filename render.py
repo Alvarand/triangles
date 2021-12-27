@@ -4,7 +4,7 @@ from config import (BLUE, BLACK, WINDOW, rects, default_lines,
                     delete_button, add_button, switch_button,
                     texts, random_position, draw,
                     get_circle_range, get_cos, radius,
-                    font)
+                    font, running)
 
 
 class Coordinates:
@@ -113,7 +113,9 @@ class NewRender:
 
     def __init__(self):
         self.polygons = []
-        self.current_polygon = Polygon()
+        self.count = '4'
+        self.count_text = font.render(self.count, True, (0, 0, 0))
+        self.current_polygon = Polygon(int(self.count))
         self.screen = pygame.display.set_mode(WINDOW)
         pygame.display.set_caption('Polygons')
         self.clock = pygame.time.Clock()
@@ -131,6 +133,7 @@ class NewRender:
             Button(650, 103, switch_button, self.switch),
         ]
         self.texts = texts
+        self.running = running
 
     def reload_screen(self):
         # reloading screen and filling with grey color
@@ -140,12 +143,37 @@ class NewRender:
         # clear polygons:[list]
         self.polygons = []
 
+    @staticmethod
+    def do_nothing():
+        return
+
+    def entering(self):
+        pass
+
+    def do_pressed_key_button(self, event):
+        if event.type == pygame.QUIT:
+            self.running = False
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_ESCAPE:
+                self.running = False
+            if event.key == pygame.K_RETURN:
+                pass
+            if event.key == pygame.K_BACKSPACE:
+                self.count = self.count[:-1]
+            elif event.unicode in (str(i) for i in range(10)):
+                self.count = str(int(self.count + event.unicode))
+            if self.count == '':
+                self.count = '0'
+            self.count_text = font.render(self.count, True, (0, 0, 0))
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            self.click()
+
     def restart(self):
         self.clear_polygon()
         self.reload_screen()
 
     def add_random_polygon(self):
-        random_polygon = Polygon()
+        random_polygon = Polygon(int(self.count))
         positions = [random_position() for _ in range(random_polygon.count_angles)]
         for i in range(random_polygon.count_angles):
             line = Line(positions[i][0], positions[i][1])
@@ -182,6 +210,7 @@ class NewRender:
 
     def render_text(self):
         # rendering default text
+        self.screen.blit(self.count_text, (610, 80))
         for text in self.texts:
             self.screen.blit(text[0], text[1])
         if not self.draw:
@@ -255,7 +284,7 @@ class NewRender:
             self.polygons.append(self.current_polygon)
 
             # restarting current polygon
-            self.current_polygon = Polygon()
+            self.current_polygon = Polygon(int(self.count))
             self.current_polygon.color = self.line_color[-1]
 
         # rendering all polygons in polygons:[list]
@@ -338,3 +367,9 @@ class NewRender:
         self.change_current_pos(pygame.mouse.get_pos())
         self.render_text()
         pygame.display.update()
+
+    def run(self):
+        while self.running:
+            for event in pygame.event.get():
+                self.do_pressed_key_button(event)
+            self.update()
