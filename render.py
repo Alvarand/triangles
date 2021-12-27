@@ -125,7 +125,6 @@ class NewRender:
         self.line_color = [610, 10, 690, 90, self.current_polygon.color]
         self.default_lines = [self.line_color] + default_lines
         self.last_pos = (0, 0)
-        self.count_current_angles = self.current_polygon.count_angles
         self.buttons = [
             Button(425, 103, delete_button, self.restart),
             Button(500, 103, add_button, self.add_random_polygon),
@@ -156,15 +155,14 @@ class NewRender:
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
                 self.running = False
-            if event.key == pygame.K_RETURN:
-                pass
-            if event.key == pygame.K_BACKSPACE:
-                self.count = self.count[:-1]
-            elif event.unicode in (str(i) for i in range(10)):
-                self.count = str(int(self.count + event.unicode))
-            if self.count == '':
-                self.count = '0'
-            self.count_text = font.render(self.count, True, (0, 0, 0))
+            if self.draw:
+                if event.key == pygame.K_BACKSPACE:
+                    self.count = self.count[:-1]
+                elif event.unicode in (str(i) for i in range(10)):
+                    self.count = str(int(self.count + event.unicode))
+                if self.count == '':
+                    self.count = '0'
+                self.count_text = font.render(self.count, True, (0, 0, 0))
         if event.type == pygame.MOUSEBUTTONDOWN:
             self.click()
 
@@ -236,7 +234,7 @@ class NewRender:
                     for angle in angles_text:
                         self.screen.blit(angle[0], angle[1])
             for polygon in self.polygons:
-                for angle in range(self.count_current_angles):
+                for angle in range(int(self.count)):
                     angles_text = [
                         [
                             font.render(
