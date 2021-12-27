@@ -1,4 +1,5 @@
 import pygame
+import random
 from math import sqrt, acos, degrees
 from config import (BLUE, BLACK, WINDOW, rects, default_lines,
                     delete_button, add_button, switch_button,
@@ -24,7 +25,12 @@ class Line:
 class Polygon:
 
     def __init__(self, n=4):
-        self.count_angles = n
+        if n > 10:
+            self.count_angles = random.randint(2, 10)
+        elif n == 0:
+            self.count_angles = 1
+        else:
+            self.count_angles = n
         self.lines = []
         self.color = BLUE
         self.sides_length = []
@@ -133,6 +139,7 @@ class NewRender:
         ]
         self.texts = texts
         self.running = running
+        self.count_old = self.count
 
     def reload_screen(self):
         # reloading screen and filling with grey color
@@ -155,16 +162,19 @@ class NewRender:
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
                 self.running = False
-            if self.draw:
-                if event.key == pygame.K_BACKSPACE:
-                    self.count = self.count[:-1]
-                elif event.unicode in (str(i) for i in range(10)):
-                    self.count = str(int(self.count + event.unicode))
-                if self.count == '':
-                    self.count = '0'
-                self.count_text = font.render(self.count, True, (0, 0, 0))
+            if event.key == pygame.K_BACKSPACE:
+                self.count = self.count[:-1]
+            elif event.unicode in (str(i) for i in range(10)):
+                self.count = str(int(self.count + event.unicode))
+            if self.count == '':
+                self.count = '0'
+            if self.count != self.count_old and not self.draw:
+                self.restart()
+                self.add_random_polygon()
+            self.count_text = font.render(self.count, True, (0, 0, 0))
         if event.type == pygame.MOUSEBUTTONDOWN:
             self.click()
+        self.count_old = self.count
 
     def restart(self):
         self.clear_polygon()
@@ -234,7 +244,7 @@ class NewRender:
                     for angle in angles_text:
                         self.screen.blit(angle[0], angle[1])
             for polygon in self.polygons:
-                for angle in range(int(self.count)):
+                for angle in range(polygon.count_angles):
                     angles_text = [
                         [
                             font.render(
