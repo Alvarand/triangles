@@ -149,10 +149,6 @@ class NewRender:
         # clear polygons:[list]
         self.polygons = []
 
-    @staticmethod
-    def do_nothing():
-        return
-
     def entering(self):
         pass
 
