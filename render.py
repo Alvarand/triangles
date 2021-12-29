@@ -120,7 +120,7 @@ class NewRender:
     def __init__(self):
         self.polygons = []
         self.count = '4'
-        self.count_text = font.render(self.count, True, (0, 0, 0))
+        self.count_text = font.render(f'current count: {self.count}', True, (0, 0, 0))
         self.current_polygon = Polygon(int(self.count))
         self.screen = pygame.display.set_mode(WINDOW)
         pygame.display.set_caption('Polygons')
@@ -128,7 +128,7 @@ class NewRender:
         self.draw = draw
         self.bg_color = (202, 228, 241)  # GREY
         self.rects = rects
-        self.line_color = [610, 10, 690, 90, self.current_polygon.color]
+        self.line_color = [410, 10, 490, 90, self.current_polygon.color]
         self.default_lines = [self.line_color] + default_lines
         self.last_pos = (0, 0)
         self.buttons = [
@@ -158,6 +158,8 @@ class NewRender:
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
                 self.running = False
+            if event.key == pygame.K_RETURN and len(self.current_polygon.lines) == 0:
+                self.current_polygon.count_angles = int(self.count)
             if event.key == pygame.K_BACKSPACE:
                 self.count = self.count[:-1]
             elif event.unicode in (str(i) for i in range(10)):
@@ -167,7 +169,7 @@ class NewRender:
             if self.count != self.count_old and not self.draw:
                 self.restart()
                 self.add_random_polygon()
-            self.count_text = font.render(self.count, True, (0, 0, 0))
+            self.count_text = font.render(f'current count: {self.count}', True, (0, 0, 0))
         if event.type == pygame.MOUSEBUTTONDOWN:
             self.click()
         self.count_old = self.count
@@ -214,7 +216,7 @@ class NewRender:
 
     def render_text(self):
         # rendering default text
-        self.screen.blit(self.count_text, (610, 80))
+        self.screen.blit(self.count_text, (510, 10))
         for text in self.texts:
             self.screen.blit(text[0], text[1])
         if not self.draw:
@@ -357,7 +359,7 @@ class NewRender:
                             button.do_it()
                 if self.buttons[-1].rect.collidepoint(position) and not len(self.current_polygon.lines):
                     self.buttons[-1].do_it()
-            elif position[1] < 100 and position[0] < 600:
+            elif position[1] < 100 and position[0] < 400:
                 self.get_color(position)
 
     def update(self):
