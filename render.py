@@ -26,8 +26,8 @@ class Polygon:
 
     def __init__(self, n=4):
         if n > 10:
-            self.count_angles = random.randint(2, 10)
-        elif n == 0:
+            n %= 10
+        if n == 0:
             self.count_angles = 1
         else:
             self.count_angles = n
@@ -120,7 +120,8 @@ class NewRender:
     def __init__(self):
         self.polygons = []
         self.count = '4'
-        self.count_text = font.render(f'current count: {self.count}', True, (0, 0, 0))
+        self.change_count = font.render(f'change to count: {self.count}', True, (0, 0, 0))
+        self.current_count = font.render(f'current count: {self.count}', True, (0, 0, 0))
         self.current_polygon = Polygon(int(self.count))
         self.screen = pygame.display.set_mode(WINDOW)
         pygame.display.set_caption('Polygons')
@@ -159,7 +160,8 @@ class NewRender:
             if event.key == pygame.K_ESCAPE:
                 self.running = False
             if event.key == pygame.K_RETURN and len(self.current_polygon.lines) == 0:
-                self.current_polygon.count_angles = int(self.count)
+                self.current_polygon = Polygon(int(self.count))
+                self.current_count = font.render(f'current count: {self.current_polygon.count_angles}', True, (0, 0, 0))
             if event.key == pygame.K_BACKSPACE:
                 self.count = self.count[:-1]
             elif event.unicode in (str(i) for i in range(10)):
@@ -169,7 +171,7 @@ class NewRender:
             if self.count != self.count_old and not self.draw:
                 self.restart()
                 self.add_random_polygon()
-            self.count_text = font.render(f'current count: {self.count}', True, (0, 0, 0))
+            self.change_count = font.render(f'change to count: {self.count}', True, (0, 0, 0))
         if event.type == pygame.MOUSEBUTTONDOWN:
             self.click()
         self.count_old = self.count
@@ -216,7 +218,8 @@ class NewRender:
 
     def render_text(self):
         # rendering default text
-        self.screen.blit(self.count_text, (510, 10))
+        self.screen.blit(self.change_count, (510, 10))
+        self.screen.blit(self.current_count, (510, 30))
         for text in self.texts:
             self.screen.blit(text[0], text[1])
         if not self.draw:
@@ -292,6 +295,8 @@ class NewRender:
             # restarting current polygon
             self.current_polygon = Polygon(int(self.count))
             self.current_polygon.color = self.line_color[-1]
+            self.current_count = font.render(f'current count: {self.current_polygon.count_angles}', True, (0, 0, 0))
+            self.change_count = font.render(f'change to count: {self.current_polygon.count_angles}', True, (0, 0, 0))
 
         # rendering all polygons in polygons:[list]
         for polygon in self.polygons:
