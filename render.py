@@ -161,6 +161,8 @@ class NewRender:
                 self.running = False
             if event.key == pygame.K_RETURN and len(self.current_polygon.lines) == 0:
                 self.current_polygon = Polygon(int(self.count))
+                self.count = str(self.current_polygon.count_angles)
+                self.current_polygon.color = self.line_color[-1]
                 self.current_count = font.render(f'current count: {self.current_polygon.count_angles}', True, (0, 0, 0))
             if event.key == pygame.K_BACKSPACE:
                 self.count = self.count[:-1]
@@ -295,6 +297,7 @@ class NewRender:
             # restarting current polygon
             self.current_polygon = Polygon(int(self.count))
             self.current_polygon.color = self.line_color[-1]
+            self.count = str(self.current_polygon.count_angles)
             self.current_count = font.render(f'current count: {self.current_polygon.count_angles}', True, (0, 0, 0))
             self.change_count = font.render(f'change to count: {self.current_polygon.count_angles}', True, (0, 0, 0))
 
