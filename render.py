@@ -139,7 +139,6 @@ class NewRender:
         ]
         self.texts = texts
         self.running = running
-        self.count_old = self.count
         self.input_rect = [pygame.Rect(510, 10, 150, 25), BLACK]
         self.text_flag = False
 
@@ -162,8 +161,7 @@ class NewRender:
                 self.running = False
             if event.key == pygame.K_RETURN:
                 if len(self.current_polygon.lines) == 0 and self.draw:
-                    self.current_polygon = Polygon(int(self.count))
-                    self.count = str(self.current_polygon.count_angles)
+                    self.create_new_polygon()
                     self.current_polygon.color = self.line_color[-1]
                     self.current_count = font.render(
                         f'current count: {self.current_polygon.count_angles}', True, (0, 0, 0)
@@ -175,20 +173,24 @@ class NewRender:
                     self.current_count = font.render(
                         f'current count: {self.polygons[0].count_angles}', True, (0, 0, 0)
                     )
-            if event.key == pygame.K_BACKSPACE:
-                self.count = self.count[:-1]
-            elif event.unicode in (str(i) for i in range(10)):
-                self.count = str(int(self.count + event.unicode))
-            if self.count == '':
-                self.count = '0'
+            if self.text_flag:
+                if event.key == pygame.K_BACKSPACE:
+                    self.count = self.count[:-1]
+                elif event.unicode in (str(i) for i in range(10)):
+                    self.count = str(int(self.count + event.unicode))
+                if self.count == '':
+                    self.count = '0'
             self.change_count = font.render(f'change to count: {self.count}', True, (0, 0, 0))
         if event.type == pygame.MOUSEBUTTONDOWN:
             self.click()
-        self.count_old = self.count
 
     def restart(self):
         self.clear_polygon()
         self.reload_screen()
+
+    def create_new_polygon(self):
+        self.current_polygon = Polygon(int(self.count))
+        self.current_polygon.color = self.line_color[-1]
 
     def add_random_polygon(self):
         random_polygon = Polygon(int(self.count))
@@ -210,6 +212,8 @@ class NewRender:
         self.restart()
         if not self.draw:
             self.add_random_polygon()
+        else:
+            self.create_new_polygon()
 
     def get_color(self, pos):
         # get color in current pixel
@@ -317,8 +321,7 @@ class NewRender:
             self.polygons.append(self.current_polygon)
 
             # restarting current polygon
-            self.current_polygon = Polygon(int(self.count))
-            self.current_polygon.color = self.line_color[-1]
+            self.create_new_polygon()
             self.count = str(self.current_polygon.count_angles)
             self.current_count = font.render(f'current count: {self.current_polygon.count_angles}', True, (0, 0, 0))
             self.change_count = font.render(f'change to count: {self.current_polygon.count_angles}', True, (0, 0, 0))
@@ -391,6 +394,10 @@ class NewRender:
                     self.buttons[-1].do_it()
             elif position[1] < 100 and position[0] < 400:
                 self.get_color(position)
+            if self.input_rect[0].collidepoint(position) and len(self.current_polygon.lines) == 0:
+                self.text_flag = True
+            else:
+                self.text_flag = False
 
     def update(self):
         self.reload_screen()
