@@ -159,20 +159,27 @@ class NewRender:
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
                 self.running = False
-            if event.key == pygame.K_RETURN and len(self.current_polygon.lines) == 0:
-                self.current_polygon = Polygon(int(self.count))
-                self.count = str(self.current_polygon.count_angles)
-                self.current_polygon.color = self.line_color[-1]
-                self.current_count = font.render(f'current count: {self.current_polygon.count_angles}', True, (0, 0, 0))
+            if event.key == pygame.K_RETURN:
+                if len(self.current_polygon.lines) == 0 and self.draw:
+                    self.current_polygon = Polygon(int(self.count))
+                    self.count = str(self.current_polygon.count_angles)
+                    self.current_polygon.color = self.line_color[-1]
+                    self.current_count = font.render(
+                        f'current count: {self.current_polygon.count_angles}', True, (0, 0, 0)
+                    )
+                if not self.draw:
+                    self.restart()
+                    self.add_random_polygon()
+                    self.count = str(self.polygons[0].count_angles)
+                    self.current_count = font.render(
+                        f'current count: {self.polygons[0].count_angles}', True, (0, 0, 0)
+                    )
             if event.key == pygame.K_BACKSPACE:
                 self.count = self.count[:-1]
             elif event.unicode in (str(i) for i in range(10)):
                 self.count = str(int(self.count + event.unicode))
             if self.count == '':
                 self.count = '0'
-            if self.count != self.count_old and not self.draw:
-                self.restart()
-                self.add_random_polygon()
             self.change_count = font.render(f'change to count: {self.count}', True, (0, 0, 0))
         if event.type == pygame.MOUSEBUTTONDOWN:
             self.click()
