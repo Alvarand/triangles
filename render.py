@@ -140,7 +140,8 @@ class NewRender:
         self.texts = texts
         self.running = running
         self.count_old = self.count
-        self.input_rect = pygame.Rect(510, 10, 150, 25)
+        self.input_rect = [pygame.Rect(510, 10, 150, 25), BLACK]
+        self.text_flag = False
 
     def reload_screen(self):
         # reloading screen and filling with grey color
@@ -227,14 +228,22 @@ class NewRender:
         for button in self.buttons:
             button.draw(self.screen)
 
-    def render_text(self):
-        # rendering default text
+    def render_upper_text(self):
+        if not self.text_flag:
+            if self.input_rect[0].collidepoint(pygame.mouse.get_pos()):
+                self.input_rect[1] = BLUE
+            else:
+                self.input_rect[1] = BLACK
         self.screen.blit(self.change_count, (515, 15))
-        self.input_rect.w = self.change_count.get_width() + 10
-        pygame.draw.rect(self.screen, BLACK, self.input_rect, 1)
+        self.input_rect[0].w = self.change_count.get_width() + 10
+        pygame.draw.rect(self.screen, self.input_rect[1], self.input_rect[0], 1)
 
         self.screen.blit(self.current_count, (515, 41))
         pygame.draw.rect(self.screen, BLACK, (510, 36, self.current_count.get_width() + 10, 25), 1)
+
+    def render_text(self):
+        # rendering default text
+        self.render_upper_text()
         for text in self.texts:
             self.screen.blit(text[0], text[1])
         if not self.draw:
