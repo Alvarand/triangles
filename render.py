@@ -141,6 +141,7 @@ class NewRender:
         self.texts = texts
         self.running = running
         self.count_old = self.count
+        self.input_rect = pygame.Rect(510, 10, 150, 25)
 
     def reload_screen(self):
         # reloading screen and filling with grey color
@@ -227,8 +228,12 @@ class NewRender:
 
     def render_text(self):
         # rendering default text
-        self.screen.blit(self.change_count, (510, 10))
-        self.screen.blit(self.current_count, (510, 30))
+        self.screen.blit(self.change_count, (515, 15))
+        self.input_rect.w = self.change_count.get_width() + 10
+        pygame.draw.rect(self.screen, BLACK, self.input_rect, 1)
+
+        self.screen.blit(self.current_count, (515, 41))
+        pygame.draw.rect(self.screen, BLACK, (510, 36, self.current_count.get_width() + 10, 25), 1)
         for text in self.texts:
             self.screen.blit(text[0], text[1])
         if not self.draw:
