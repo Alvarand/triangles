@@ -163,6 +163,7 @@ class NewRender:
                 if len(self.current_polygon.lines) == 0 and self.draw:
                     self.create_new_polygon()
                     self.current_polygon.color = self.line_color[-1]
+                    self.count = str(self.current_polygon.count_angles)
                     self.current_count = font.render(
                         f'current count: {self.current_polygon.count_angles}', True, (0, 0, 0)
                     )
@@ -180,7 +181,7 @@ class NewRender:
                     self.count = str(int(self.count + event.unicode))
                 if self.count == '':
                     self.count = '0'
-            self.change_count = font.render(f'change to count: {self.count}', True, (0, 0, 0))
+                self.change_count = font.render(f'change to count: {self.count}', True, (0, 0, 0))
         if event.type == pygame.MOUSEBUTTONDOWN:
             self.click()
 
