@@ -1,5 +1,4 @@
 import pygame
-import random
 from math import sqrt, acos, degrees
 from config import (BLUE, BLACK, WINDOW, rects, default_lines,
                     delete_button, add_button, switch_button,
@@ -215,6 +214,8 @@ class NewRender:
         # get color in current pixel
         self.current_polygon.color = self.screen.get_at(pos)
         self.line_color[-1] = self.current_polygon.color
+        if not self.draw:
+            self.polygons[0].color = self.current_polygon.color
 
     def render_rect(self):
         # rendering all default rectangles
