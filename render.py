@@ -167,7 +167,7 @@ class NewRender:
                     self.current_count = font.render(
                         f'current count: {self.current_polygon.count_angles}', True, (0, 0, 0)
                     )
-                if not self.draw:
+                if not self.draw and self.count != str(self.polygons[0].count_angles):
                     self.restart()
                     self.add_random_polygon()
                     self.count = str(self.polygons[0].count_angles)
