@@ -141,6 +141,7 @@ class NewRender:
         self.running = running
         self.input_rect = [pygame.Rect(510, 10, 150, 25), BLACK]
         self.text_flag = False
+        self.count_old = self.count
 
     def reload_screen(self):
         # reloading screen and filling with grey color
@@ -160,6 +161,7 @@ class NewRender:
             if event.key == pygame.K_ESCAPE:
                 self.running = False
             if event.key == pygame.K_RETURN:
+                self.count_old = self.count
                 if len(self.current_polygon.lines) == 0 and self.draw:
                     self.create_new_polygon()
                     self.current_polygon.color = self.line_color[-1]
@@ -190,16 +192,17 @@ class NewRender:
         self.reload_screen()
 
     def create_new_polygon(self):
-        self.current_polygon = Polygon(int(self.count))
+        self.current_polygon = Polygon(int(self.count_old))
         self.current_polygon.color = self.line_color[-1]
 
     def add_random_polygon(self):
-        random_polygon = Polygon(int(self.count))
-        positions = [random_position() for _ in range(random_polygon.count_angles)]
-        for i in range(random_polygon.count_angles):
+        random_polygon = Polygon(int(self.count_old))
+        count_angles = random_polygon.count_angles
+        positions = [random_position() for _ in range(count_angles)]
+        for i in range(count_angles):
             line = Line(positions[i][0], positions[i][1])
-            line.end_pos.x = positions[(i + 1) % random_polygon.count_angles][0]
-            line.end_pos.y = positions[(i + 1) % random_polygon.count_angles][1]
+            line.end_pos.x = positions[(i + 1) % count_angles][0]
+            line.end_pos.y = positions[(i + 1) % count_angles][1]
             random_polygon.lines.append(line)
         random_polygon.color = self.line_color[-1]
         random_polygon.calculate_length()
@@ -323,9 +326,6 @@ class NewRender:
 
             # restarting current polygon
             self.create_new_polygon()
-            self.count = str(self.current_polygon.count_angles)
-            self.current_count = font.render(f'current count: {self.current_polygon.count_angles}', True, (0, 0, 0))
-            self.change_count = font.render(f'change to count: {self.current_polygon.count_angles}', True, (0, 0, 0))
 
         # rendering all polygons in polygons:[list]
         for polygon in self.polygons:
