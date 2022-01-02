@@ -181,7 +181,7 @@ class NewRender:
                     self.count = str(int(self.count + event.unicode))
                 if self.count == '':
                     self.count = '0'
-                self.change_count = font.render(f'change to count: {self.count}', True, (0, 0, 0))
+            self.change_count = font.render(f'change to count: {self.count}', True, (0, 0, 0))
         if event.type == pygame.MOUSEBUTTONDOWN:
             self.click()
 
