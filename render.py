@@ -62,7 +62,7 @@ class Polygon:
         if len(self.lines) != 1:
             self.lines[len(self.lines) - 2].end_pos.x = pos[0]
             self.lines[len(self.lines) - 2].end_pos.y = pos[1]
-        if len(self.lines) == self.count_angles:
+        if len(self.lines) >= self.count_angles:
             self.lines[-1].end_pos.x = self.lines[0].start_pos.x
             self.lines[-1].end_pos.y = self.lines[0].start_pos.y
 
@@ -318,7 +318,7 @@ class NewRender:
 
     def render_polygon(self):
 
-        if len(self.current_polygon.lines) == self.current_polygon.count_angles:
+        if len(self.current_polygon.lines) >= self.current_polygon.count_angles:
             # if drew three lines, then calculating all metrics
             self.current_polygon.calculate_length()
             # then adding current polygon in polygons:[list]
